@@ -1,0 +1,315 @@
+<template>
+  <div id="tableheader">
+    <div id="dirheader">
+      <div class="dirname">
+        <span>组织机构</span>
+      </div>
+      <div class="dirchoose">
+        <div class="chosel">
+          <el-select v-model="value" placeholder="请选择" size="small">
+            <el-option
+              v-for="item in options1"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"/>
+          </el-select>
+        </div>
+        <div class="choinp">
+          <el-input v-model="inputdetails" placeholder="请输入内容" size="small"/>
+        </div>
+        <div class="choser">
+          <el-button type="primary" icon="el-icon-search" size="small">搜索</el-button>
+        </div>
+        <div class="cho2">
+          <el-button type="success" plain size="small" icon="el-icon-edit" style="margin-left: 1px" @click="edit">编辑</el-button>
+          <el-button type="danger" plain size="small" icon="el-icon-edit" style="margin-left: 1px" @click="dialogFormVisible = true">新增</el-button>
+          <el-button type="warning" plain size="small" icon="el-icon-edit" style="margin-left: 1px" @click="dialogFormVisible = true">删除</el-button>
+          <el-button type="success" plain size="small" icon="el-icon-edit" style="margin-left: 1px" @click="dialogFormVisible = true">重置密码</el-button>
+          <el-button type="danger" plain size="small" icon="el-icon-edit" style="margin-left: 1px" @click="dialogFormVisible = true">更多</el-button>
+          <el-button type="warning" plain size="small" icon="el-icon-edit" style="margin-left: 1px" @click="dialogFormVisible = true">用户权限</el-button>
+          <el-button type="success" plain size="small" icon="el-icon-edit" style="margin-left: 1px" @click="dialogFormVisible = true">访问过滤</el-button>
+        </div>
+      </div>
+    </div>
+
+    <el-dialog title="添加机构" :visible.sync="dialogFormVisible">
+      <el-form ref="form" :model="form" label-width="80px">
+        <el-form-item label="公司名称">
+          <el-input v-model="form.fullname"></el-input>
+        </el-form-item>
+        <el-form-item label="外文名称">
+          <el-input v-model="form.encode"></el-input>
+        </el-form-item>
+        <el-form-item label="上级公司">
+          <treelist v-model="upcompany" :props="defaultProps" :options="orglist" placeholder="请选择"></treelist>
+        </el-form-item>
+        <el-form-item label="负责人">
+          <treelist v-model="manager" :props="defaultProps" :options="orglist" placeholder="请选择"></treelist>
+        </el-form-item>
+        <el-form-item label="电子邮箱">
+          <el-input v-model="form.email"></el-input>
+        </el-form-item>
+        <el-form-item label="公司地点">
+          <el-input v-model="form.address"></el-input>
+        </el-form-item>
+        <el-form-item label="邮编">
+          <el-input v-model="form.cityid"></el-input>
+        </el-form-item>
+        <el-form-item label="公司性质">
+          <treelist v-model="nature" :props="defaultProps" :options="companyNature" placeholder="请选择"></treelist>
+        </el-form-item>
+        <el-form-item label="成立时间">
+          <el-input v-model="form.createdate"></el-input>
+        </el-form-item>
+        <el-form-item label="电话">
+          <el-input v-model="form.outerphone"></el-input>
+        </el-form-item>
+        <el-form-item label="传真">
+          <el-input v-model="form.postalcode"></el-input>
+        </el-form-item>
+        <el-form-item label="公司官网">
+          <el-input v-model="form.webaddress"></el-input>
+        </el-form-item>
+        <el-form-item label="经营范围">
+          <el-input v-model="form.businessscope"></el-input>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input type="textarea" v-model="form.description"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addCompany(form)">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="编辑机构" :visible.sync="dialogEditVisible">
+      <el-form ref="formEdit" :model="formEdit" label-width="80px">
+        <el-form-item label="公司名称">
+          <el-input v-model="formEdit.fullname"></el-input>
+        </el-form-item>
+        <el-form-item label="外文名称">
+          <el-input v-model="form.encode"></el-input>
+        </el-form-item>
+        <el-form-item label="上级公司">
+          <treelist v-model="upcompany" :props="defaultProps" :options="orglist" placeholder="请选择"></treelist>
+        </el-form-item>
+        <el-form-item label="负责人">
+          <treelist v-model="manager" :props="defaultProps" :options="orglist" placeholder="请选择"></treelist>
+        </el-form-item>
+        <el-form-item label="电子邮箱">
+          <el-input v-model="formEdit.email"></el-input>
+        </el-form-item>
+        <el-form-item label="公司地点">
+          <el-input v-model="formEdit.address"></el-input>
+        </el-form-item>
+        <el-form-item label="邮编">
+          <el-input v-model="formEdit.cityid"></el-input>
+        </el-form-item>
+        <el-form-item label="公司性质">
+          <treelist v-model="nature" :props="defaultProps" :options="companyNature" placeholder="请选择"></treelist>
+        </el-form-item>
+        <el-form-item label="成立时间">
+          <el-input v-model="formEdit.createdate"></el-input>
+        </el-form-item>
+        <el-form-item label="电话">
+          <el-input v-model="formEdit.outerphone"></el-input>
+        </el-form-item>
+        <el-form-item label="传真">
+          <el-input v-model="formEdit.postalcode"></el-input>
+        </el-form-item>
+        <el-form-item label="公司官网">
+          <el-input v-model="formEdit.webaddress"></el-input>
+        </el-form-item>
+        <el-form-item label="经营范围">
+          <el-input v-model="formEdit.businessscope"></el-input>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input type="textarea" v-model="form.description"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editCompany(formEdit)">确 定</el-button>
+      </div>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+  import treelist from './treelist'
+  import treeTable from "@/views/Core/table/treeTable/treeTable"
+    export default {
+        name: "tableheader",
+      components:{ treelist ,treeTable},
+      data:function () {
+        return {
+          options: [],
+          defaultProps: {
+            parent: 'itemcode',   // 父级唯一标识
+            value: 'id',          // 唯一标识
+            label: 'item',       // 标签显示
+            children: 'children', // 子级
+          },
+          upcompany:'',
+          manager:'',
+          options1: [{
+            value: '项目名',
+            label: '项目名'
+          }, {
+            value: '项目值',
+            label: '项目值'
+          }, {
+            value: '拼音',
+            label: '拼音'
+          }],
+          value:'',
+          inputdetails: '',
+          form: {
+            fullname: '',
+            encode: '',
+            email: '',
+            address: '',
+            cityid: '',
+            createdate:'',
+            outerphone: '',
+            postalcode: '',
+            webaddress:'',
+            businessscope: '',
+            description:'',
+            parentid:'',
+            managerid:'',
+            nature:''
+          },
+          formEdit: {
+            fullname: '',
+            encode: '',
+            email: '',
+            address: '',
+            cityid: '',
+            createdate:'',
+            outerphone: '',
+            postalcode: '',
+            webaddress:'',
+            businessscope: '',
+            description:'',
+            parentid:'',
+            managerid:'',
+            nature:''
+          },
+          dialogFormVisible: false,
+          dialogEditVisible:false,
+          formLabelWidth: '120px',
+          nature:'',
+          companyNature:[{
+            itemcode: '国家机关',   // 父级唯一标识
+            id: '国家机关',          // 唯一标识
+            item: '国家机关',       // 标签显示
+            children: [], // 子级
+          },{
+            itemcode: '房地产',
+            id: '房地产',
+            item: '房地产',
+            children: [],
+          },{
+            itemcode: '建筑业',
+            id: '建筑业',
+            item: '建筑业',
+            children: [],
+          },{
+            itemcode: '社会服务业',
+            id: '社会服务业',
+            item: '社会服务业',
+            children: [],
+          },{
+            itemcode: '制造业',
+            id: '制造业',
+            item: '制造业',
+            children: [],
+          },{
+            itemcode: '互联网',
+            id: '互联网',
+            item: '互联网',
+            children: [],
+          },{
+            itemcode: '金融业',
+            id: '金融业',
+            item: '金融业',
+            children: [],
+          },{
+            itemcode: '其他业',
+            id: '其他业',
+            item: '其他业',
+            children: [],
+          }]
+        }
+      },
+      methods:{
+        addCompany:function (data) {
+          this.dialogFormVisible = false;
+          this.form.parentid = this.upcompany;
+          this.form.managerid = this.manager;
+          this.form.nature = this.nature;
+          let datamation = JSON.stringify(data);
+          console.log(datamation);
+          this.$api.dic.saveOrganize(datamation)
+        },
+        edit:function(){
+          this.dialogEditVisible = true;
+          this.formEdit = current;
+        },
+        editCompany:function () {
+          let datamationEdit = JSON.stringify(data);
+          this.$api.dic.updateOrganize(datamationEdit)
+        }
+      },
+      computed:{
+        orglist:function () {
+          return this.$store.getters.orglist
+        },
+        current:function () {
+          return this.$store.getters.current
+        }
+      },
+    }
+</script>
+
+<style scoped>
+  #dirheader{
+    height: 80px;
+  }
+  .dirname{
+    height: 30px;
+    line-height: 30px;
+    border-bottom: 1px solid #c5c9cf;
+    font-size: 12px;
+  }
+  .dirname span{
+    float: left;
+  }
+  .dirchoose{
+    height: 50px;
+  }
+  .dirchoose>*{
+    margin-top: 8px;
+  }
+  .choinp,.chosel,.choser{
+    display: inline-block;
+    float: left;
+  }
+  .chosel{
+    width: 100px;
+  }
+  .choinp{
+    width: 200px;
+    margin-left: 2px;
+    margin-right: 2px;
+  }
+  .cho2{
+    float: right;
+    margin-right: 10px;
+  }
+  .cho2 div{
+    float: right;
+  }
+</style>

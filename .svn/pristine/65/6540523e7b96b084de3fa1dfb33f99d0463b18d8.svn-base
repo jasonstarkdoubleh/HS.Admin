@@ -1,0 +1,113 @@
+<template>
+  <div id="tablemain">
+    <div id="dirtable">
+      <el-table
+        :data="orgall"
+        border
+        highlight-current-row
+        @current-change="handleCurrentChange"
+        style="width: 100%">
+        <el-table-column
+          v-for="item in tablecols"
+          :key="item.label"
+          :type="item.type"
+          :width="item.width"
+          :prop="item.value"
+          :label="item.label">
+        </el-table-column>
+        <!-- <el-table-column label="actions" align="center">
+          <template slot-scope="scope">
+            <el-button v-for="item in tableBut" v-if="item.status" :key="item.name" :size="item.size" :type="item.type">{{ item.name }}</el-button>
+          </template>
+        </el-table-column> -->
+      </el-table>
+    </div>
+  </div>
+</template>
+
+<script>
+    export default {
+        name: "tablebody",
+      data:function () {
+        return {
+          tablecols: [
+          //   {
+          //   type:'selection',
+          //   width:'50px',
+          //   label:'',
+          //   value:''
+          // },
+            {
+            type:'',
+            width:'230px',
+            label:'公司名称',
+            value:'fullname'
+          },{
+            type:'',
+            width:'120px',
+            label:'外文名称',
+            value:'encode'
+          },{
+            type:'',
+            width:'100px',
+            label:'公司性质',
+            value:'nature'
+          },{
+            type:'',
+            width:'150px',
+            label:'成立时间',
+            value:'createdate'
+          },{
+            type:'',
+            width:'100px',
+            label:'负责人',
+            value:'manager'
+          },{
+            type:'',
+            width:'150px',
+            label:'经营范围',
+            value:'outerphone'
+          },{
+            type:'',
+            width:'',
+            label:'备注',
+            value:'description'
+          }],
+          tableBut: [{
+            type: 'primary',
+            size: 'mini',
+            status: true,
+            name: '编辑'
+          }, {
+            type: 'danger',
+            size: 'mini',
+            status: true,
+            name: '详细'
+          }, {
+            type: 'success',
+            size: 'mini',
+            status: true,
+            name: '删除'
+          }],
+        }
+      },
+      methods:{
+        handleCurrentChange:function (val) {
+          console.log(val)
+          this.$store.commit("setCurrent",val)
+        }
+      },
+      computed:{
+        tabledel:function () {
+          return this.$store.getters.tabledel
+        },
+        orgall:function () {
+          return this.$store.getters.orgall
+        }
+      }
+    }
+</script>
+
+<style scoped>
+
+</style>

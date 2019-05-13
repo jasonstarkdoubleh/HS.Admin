@@ -1,0 +1,12 @@
+body{
+  overflow: hidden;
+}
+.el-aside>#tableaside{
+  overflow: hidden;
+}
+ul.menu-bar-width .el-scrollbar__wrap{
+  overflow-x: hidden;
+}
+.app-container .el-scrollbar__wrap{
+  overflow-x: hidden;
+}

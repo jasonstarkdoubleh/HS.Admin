@@ -1,0 +1,403 @@
+<template>
+  <div id="tableheader">
+    <div id="dirheader">
+      <div class="dirname">
+        <span>用户管理</span>
+      </div>
+      <div class="dirchoose">
+        <div class="chosel">
+          <el-select v-model="value" placeholder="请选择" size="small">
+            <el-option
+              v-for="item in options1"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"/>
+          </el-select>
+        </div>
+        <div class="choinp">
+          <el-input v-model="inputdetails" placeholder="请输入内容" size="small"/>
+        </div>
+        <div class="choser">
+          <el-button type="primary" icon="el-icon-search" size="small" @click="searchContent">搜索</el-button>
+        </div>
+        <div class="cho2">
+          <el-button type="success" plain size="small" icon="el-icon-edit" style="margin-left: 1px" @click="edit">编辑</el-button>
+          <el-button type="danger" plain size="small" icon="el-icon-edit" style="margin-left: 1px" @click="dialogFormVisible = true">新增</el-button>
+          <el-button type="warning" plain size="small" icon="el-icon-edit" style="margin-left: 1px" @click="">删除</el-button>
+          <el-button type="success" plain size="small" icon="el-icon-edit" style="margin-left: 1px" @click="">重置密码</el-button>
+          <el-button type="danger" plain size="small" icon="el-icon-edit" style="margin-left: 1px" @click="">更多</el-button>
+          <el-button type="warning" plain size="small" icon="el-icon-edit" style="margin-left: 1px" @click="">用户权限</el-button>
+          <el-button type="success" plain size="small" icon="el-icon-edit" style="margin-left: 1px" @click="">访问过滤</el-button>
+        </div>
+      </div>
+    </div>
+
+    <el-dialog title="添加用户" :visible.sync="dialogFormVisible">
+      <el-form ref="form" :model="form" label-width="80px" :inline="true" :label-position="labelPosition">
+        <el-form-item label="账户">
+          <el-input v-model="form.username"></el-input>
+        </el-form-item>
+        <el-form-item label="密码">
+          <el-input v-model="form.password"></el-input>
+        </el-form-item>
+        <el-form-item label="公司">
+          <treelist v-model="upcompany" :props="defaultProps" :options="orglist" placeholder="请选择"></treelist>
+          <!--<el-input v-model="form.organizeid"></el-input>-->
+        </el-form-item>
+        <el-form-item label="部门">
+          <el-input v-model="form.departmentid"></el-input>
+        </el-form-item>
+        <el-form-item label="岗位">
+          <el-input v-model="form.dutyid"></el-input>
+        </el-form-item>
+        <el-form-item label="职位">
+          <el-input v-model="form.postid"></el-input>
+        </el-form-item>
+        <el-form-item label="角色">
+          <el-input v-model="form.roleid"></el-input>
+        </el-form-item>
+        <el-form-item label="主管">
+          <el-input v-model="form.managerid"></el-input>
+        </el-form-item>
+        <el-form-item label="工号">
+          <el-input v-model="form.userid"></el-input>
+        </el-form-item>
+        <el-form-item label="姓名">
+          <el-input v-model="form.realname"></el-input>
+        </el-form-item>
+        <el-form-item label="性别">
+          <el-input v-model="form.gender"></el-input>
+        </el-form-item>
+        <el-form-item label="生日">
+          <el-input v-model="form.birthday"></el-input>
+        </el-form-item>
+        <el-form-item label="手机">
+          <el-input v-model="form.mobile"></el-input>
+        </el-form-item>
+        <el-form-item label="电话">
+          <el-input v-model="form.telephone"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="form.email"></el-input>
+        </el-form-item>
+        <el-form-item label="微信">
+          <el-input v-model="form.wechat"></el-input>
+        </el-form-item>
+        <el-form-item label="QQ">
+          <el-input v-model="form.oicq"></el-input>
+        </el-form-item>
+        <el-form-item label="MSN">
+          <el-input v-model="form.msn"></el-input>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input type="textarea" v-model="form.description"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addCompany(form)">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="编辑用户" :visible.sync="dialogEditVisible">
+      <el-form ref="formEdit" :model="formEdit" label-width="80px" :inline="true" :label-position="labelPosition">
+        <el-form-item label="账户">
+          <el-input v-model="formEdit.username"></el-input>
+        </el-form-item>
+        <el-form-item label="密码">
+          <el-input v-model="formEdit.password"></el-input>
+        </el-form-item>
+        <el-form-item label="公司">
+          <treelist v-model="upcompany" :props="defaultProps" :options="orglist" placeholder="请选择"></treelist>
+          <!--<el-input v-model="form.organizeid"></el-input>-->
+        </el-form-item>
+        <el-form-item label="部门">
+          <el-input v-model="formEdit.departmentid"></el-input>
+        </el-form-item>
+        <el-form-item label="岗位">
+          <el-input v-model="formEdit.dutyid"></el-input>
+        </el-form-item>
+        <el-form-item label="职位">
+          <el-input v-model="formEdit.postid"></el-input>
+        </el-form-item>
+        <el-form-item label="角色">
+          <el-input v-model="formEdit.roleid"></el-input>
+        </el-form-item>
+        <el-form-item label="主管">
+          <el-input v-model="formEdit.managerid"></el-input>
+        </el-form-item>
+        <el-form-item label="工号">
+          <el-input v-model="formEdit.userid"></el-input>
+        </el-form-item>
+        <el-form-item label="姓名">
+          <el-input v-model="formEdit.realname"></el-input>
+        </el-form-item>
+        <el-form-item label="性别">
+          <el-input v-model="formEdit.gender"></el-input>
+        </el-form-item>
+        <el-form-item label="生日">
+          <el-input v-model="formEdit.birthday"></el-input>
+        </el-form-item>
+        <el-form-item label="手机">
+          <el-input v-model="formEdit.mobile"></el-input>
+        </el-form-item>
+        <el-form-item label="电话">
+          <el-input v-model="formEdit.telephone"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="formEdit.email"></el-input>
+        </el-form-item>
+        <el-form-item label="微信">
+          <el-input v-model="formEdit.wechat"></el-input>
+        </el-form-item>
+        <el-form-item label="QQ">
+          <el-input v-model="formEdit.oicq"></el-input>
+        </el-form-item>
+        <el-form-item label="MSN">
+          <el-input v-model="formEdit.msn"></el-input>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input type="textarea" v-model="formEdit.description"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogEditVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editCompany(formEdit)">确 定</el-button>
+      </div>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+  import treelist from './treelist'
+  import treeTable from "@/views/Core/table/treeTable/treeTable"
+    export default {
+        name: "tableheader",
+      components:{ treelist ,treeTable},
+      data:function () {
+        return {
+          labelPosition: 'right',
+          options: [],
+          defaultProps: {
+            parent: 'itemcode',   // 父级唯一标识
+            value: 'id',          // 唯一标识
+            label: 'item',       // 标签显示
+            children: 'children', // 子级
+          },
+          upcompany:'',
+          manager:'',
+          options1: [{
+            value: '1',
+            label: '账户'
+          }, {
+            value: '2',
+            label: '姓名'
+          }, {
+            value: '3',
+            label: '手机'
+          }],
+          value:'',
+          inputdetails: '',
+          tableSelect:[],
+          form: {
+            username: '',
+            password: '',
+            organizeid: '',
+            departmentid: '',
+            dutyid: '',
+            postid:'',
+            roleid: '',
+            managerid: '',
+            userid:'',
+            realname:'',
+            gender:'',
+            birthday:'',
+            mobile:'',
+            telephone:'',
+            email:'',
+            wechat:'',
+            oicq:'',
+            msn:'',
+            description:''
+          },
+          formEdit: {
+            username: '',
+            password: '',
+            organizeid: '',
+            departmentid: '',
+            dutyid: '',
+            postid:'',
+            roleid: '',
+            managerid: '',
+            userid:'',
+            realname:'',
+            gender:'',
+            birthday:'',
+            mobile:'',
+            telephone:'',
+            email:'',
+            wechat:'',
+            oicq:'',
+            msn:'',
+            description:''
+          },
+          dialogFormVisible: false,
+          dialogEditVisible:false,
+          formLabelWidth: '120px',
+          nature:'',
+          companyNature:[{
+            itemcode: '国家机关',   // 父级唯一标识
+            id: '国家机关',          // 唯一标识
+            item: '国家机关',       // 标签显示
+            children: [], // 子级
+          },{
+            itemcode: '房地产',
+            id: '房地产',
+            item: '房地产',
+            children: [],
+          },{
+            itemcode: '建筑业',
+            id: '建筑业',
+            item: '建筑业',
+            children: [],
+          },{
+            itemcode: '社会服务业',
+            id: '社会服务业',
+            item: '社会服务业',
+            children: [],
+          },{
+            itemcode: '制造业',
+            id: '制造业',
+            item: '制造业',
+            children: [],
+          },{
+            itemcode: '互联网',
+            id: '互联网',
+            item: '互联网',
+            children: [],
+          },{
+            itemcode: '金融业',
+            id: '金融业',
+            item: '金融业',
+            children: [],
+          },{
+            itemcode: '其他业',
+            id: '其他业',
+            item: '其他业',
+            children: [],
+          }]
+        }
+      },
+      methods:{
+        searchContent:function(){
+          this.tableSelect = [];
+          if(this.inputdetails == ''){
+            this.$api.dic.getUserInfos().then(res => {
+              this.$store.dispatch("setUser",res.data.data)
+            });
+          }else{
+            if(this.value == 1){
+              for(let i in this.userInfos){
+                if(this.userInfos[i].username){
+                  if(this.userInfos[i].username.indexOf(this.inputdetails) != -1){
+                    this.tableSelect.push(this.userInfos[i]);
+                  }
+                }
+              }
+              this.$store.commit("setUserInfo",this.tableSelect);
+            }
+            if(this.value == 2){
+              for(let i in this.userInfos){
+                console.log(this.userInfos[i].realname);
+                if(this.userInfos[i].realname){
+                  if(this.userInfos[i].realname.indexOf(this.inputdetails) != -1){
+                    this.tableSelect.push(this.userInfos[i]);
+                  }
+                }
+              }
+              console.log(this.tableSelect);
+              this.$store.commit("setUserInfo",this.tableSelect);
+            }
+            if(this.value == 3){
+              for(let i in this.userInfos){
+                if(this.userInfos[i].mobile){
+                  if(this.userInfos[i].mobile.indexOf(this.inputdetails) != -1){
+                    this.tableSelect.push(this.userInfos[i]);
+                  }
+                }
+              }
+              this.$store.dispatch("setUser",this.tableSelect);
+            }
+          }
+        },
+        addCompany:function (data) {
+          this.dialogFormVisible = false;
+          this.form.parentid = this.upcompany;
+          this.form.managerid = this.manager;
+          this.form.nature = this.nature;
+          let datamation = JSON.stringify(data);
+          // console.log(datamation);
+          this.$api.dic.saveOrganize(datamation)
+        },
+        edit:function(){
+          this.dialogEditVisible = true;
+          this.formEdit = this.current;
+        },
+        editCompany:function () {
+          let datamationEdit = JSON.stringify(data);
+          this.$api.dic.updateOrganize(datamationEdit)
+        }
+      },
+      computed:{
+        orglist:function () {
+          return this.$store.getters.orglist
+        },
+        current:function () {
+          return this.$store.getters.current
+        },
+        userInfos:function () {
+          return this.$store.getters.userInfo
+        }
+      },
+    }
+</script>
+
+<style scoped>
+  #dirheader{
+    height: 80px;
+  }
+  .dirname{
+    height: 30px;
+    line-height: 30px;
+    border-bottom: 1px solid #c5c9cf;
+    font-size: 12px;
+  }
+  .dirname span{
+    float: left;
+  }
+  .dirchoose{
+    height: 50px;
+  }
+  .dirchoose>*{
+    margin-top: 8px;
+  }
+  .choinp,.chosel,.choser{
+    display: inline-block;
+    float: left;
+  }
+  .chosel{
+    width: 100px;
+  }
+  .choinp{
+    width: 200px;
+    margin-left: 2px;
+    margin-right: 2px;
+  }
+  .cho2{
+    float: right;
+    margin-right: 10px;
+  }
+  .cho2 div{
+    float: right;
+  }
+</style>

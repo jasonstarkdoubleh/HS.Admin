@@ -1,0 +1,20 @@
+<template>
+  <div id="tablefooter">
+    <div class="block">
+      <el-pagination
+        layout="prev, pager, next"
+        :total="1000">
+      </el-pagination>
+    </div>
+  </div>
+</template>
+
+<script>
+    export default {
+        name: "tablefooter"
+    }
+</script>
+
+<style scoped>
+
+</style>

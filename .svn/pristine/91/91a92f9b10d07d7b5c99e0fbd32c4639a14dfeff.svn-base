@@ -1,0 +1,62 @@
+<template>
+  <div class="app-container">
+    <tree-table :data="orglist" :columns="columnsgo" border />
+  </div>
+</template>
+
+<script>
+  import treeTable from '@/components/TreeTable'
+
+  export default {
+    name: 'TreeTableDemo',
+    components: { treeTable },
+    data() {
+      return {
+        columnsgo:[
+          {
+            text: "公司名称",
+            value: "fullname",
+            width: 400,
+          },
+          {
+            text: "外文名称",
+            value: "encode"
+          },
+          {
+            text: "公司性质",
+            value: "nature"
+          },
+          {
+            text: "成立时间",
+            value: "createdate"
+          },
+          {
+            text: "负责人",
+            value: "manager"
+          },
+          {
+            text: "经营范围",
+            value: "outerphone"
+          },
+          {
+            text: "备注",
+            value: "description"
+          }
+        ],
+      }
+    },
+    props:["navigation2"],
+    computed:{
+      navication:function () {
+        return this.$store.getters.navigation;
+      },
+      orglist:function () {
+        console.log(this.$store.getters.orglist2);
+        return this.$store.getters.orglist2
+      }
+    }
+  }
+</script>
+<!--<el-tag style="margin-bottom:20px;">-->
+<!--<a href="https://github.com/PanJiaChen/vue-element-admin/tree/master/src/components/TreeTable" target="_blank">Documentation</a>-->
+<!--</el-tag>-->

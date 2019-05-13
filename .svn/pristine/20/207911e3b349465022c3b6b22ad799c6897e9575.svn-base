@@ -1,0 +1,379 @@
+<template>
+  <div id="tableheader">
+    <div id="dirheader">
+      <div class="dirname">
+        <span>用户字典</span>
+      </div>
+      <div class="dirchoose">
+        <div class="chosel">
+          <el-select v-model="value" placeholder="请选择" size="small">
+            <el-option
+              v-for="item in options1"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"/>
+          </el-select>
+        </div>
+        <div class="choinp">
+          <el-input v-model="inputdetails" placeholder="请输入内容" size="small"/>
+        </div>
+        <div class="choser">
+          <el-button type="primary" icon="el-icon-search" size="small" @click="searchContent">搜索</el-button>
+        </div>
+        <div class="cho2">
+          <el-button type="success" plain size="small" icon="el-icon-edit" style="margin-left: 1px" @click="dialogFormVisible = true">新增</el-button>
+          <el-button type="warning" plain size="small" icon="el-icon-edit" style="margin-left: 1px" @click="dictable">字典分类</el-button>
+        </div>
+      </div>
+    </div>
+    <el-dialog title="添加字典" :visible.sync="dialogFormVisible">
+      <el-form ref="form" :model="form" label-width="80px">
+        <el-form-item label="项目名">
+          <el-input v-model="form.itemname"></el-input>
+        </el-form-item>
+        <el-form-item label="项目值">
+          <el-input v-model="form.itemvalue"></el-input>
+        </el-form-item>
+        <el-form-item label="排序">
+          <el-input v-model="form.sortcode"></el-input>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input type="textarea" v-model="form.description"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addDirtails(form)">确 定</el-button>
+      </div>
+    </el-dialog>
+    <el-dialog title="字典分类" :visible.sync="dialogTableVisible" width="800px">
+      <el-container>
+        <el-header style="height: 20px">
+          <div class="choinp">
+            <el-input v-model="inputform" placeholder="请输入内容" size="small"/>
+          </div>
+          <div class="choser">
+            <el-button type="primary" icon="el-icon-search" size="small" @click="searchall">搜索</el-button>
+          </div>
+          <div class="cho2">
+            <el-button type="primary" size="small" icon="el-icon-edit" style="margin-left: 1px" @click="getDataTable">编辑</el-button>
+            <el-button type="success" size="small" icon="el-icon-edit" style="margin-left: 1px" @click="addcontents">新增</el-button>
+            <el-button type="danger" size="small" icon="el-icon-edit" style="margin-left: 1px" @click="delForm">删除</el-button>
+          </div>
+        </el-header>
+        <el-main>
+          <tree-table border/>
+        </el-main>
+      </el-container>
+    </el-dialog>
+    <el-dialog title="添加分类" :visible.sync="dialogContentsVisible">
+      <el-form ref="formcontents" :model="formcontents" label-width="80px">
+        <el-form-item label="上级">
+          <treelist v-model="selected" :props="defaultProps" :options="options"></treelist>
+        </el-form-item>
+        <el-form-item label="名称">
+          <el-input v-model="formcontents.itemname"></el-input>
+        </el-form-item>
+        <el-form-item label="编号">
+          <el-input v-model="formcontents.itemcode"></el-input>
+        </el-form-item>
+        <el-form-item label="排序">
+          <el-input v-model="formcontents.sortcode"></el-input>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input type="textarea" v-model="formcontents.description"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogContentsVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addtable(formcontents)">确 定</el-button>
+      </div>
+    </el-dialog>
+    <el-dialog title="编辑分类" :visible.sync="dialogEditVisible">
+      <el-form ref="formEdit" :model="formEdit" label-width="80px">
+        <el-form-item label="上级">
+          <treelist v-model="selected2" :props="defaultProps" :options="options"></treelist>
+        </el-form-item>
+        <el-form-item label="名称">
+          <el-input v-model="formEdit.itemname"></el-input>
+        </el-form-item>
+        <el-form-item label="编号">
+          <el-input v-model="formEdit.itemcode"></el-input>
+        </el-form-item>
+        <el-form-item label="排序">
+          <el-input v-model="formEdit.sortcode"></el-input>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input type="textarea" v-model="formEdit.description"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogEditVisible = false">取 消</el-button>
+        <el-button type="primary" @click="updateEdit">确 定</el-button>
+      </div>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+  import treelist from './treelist'
+  import treeTable from "@/views/Core/table/treeTable/treeTable"
+  // import {addform,deleteform,updateform,searchform} from "@/api/dic";
+    export default {
+        name: "tableheader",
+      components:{ treelist ,treeTable},
+      data:function () {
+        return {
+          tableSelect:[],
+          currentRows:'',
+          navigations:[],
+          itemcodes:'',
+          handleAllRow:'',
+          options: [],
+          defaultProps: {
+            parent: 'itemcode',   // 父级唯一标识
+            value: 'id',          // 唯一标识
+            label: 'item',       // 标签显示
+            children: 'children', // 子级
+          },
+          selected:'',
+          selected2:'',
+          options1: [{
+            value: '1',
+            label: '项目名'
+          }, {
+            value: '2',
+            label: '项目值'
+          }],
+          value:'',
+          inputdetails: '',
+          inputform:'',
+          navigation3:[{
+            item:'',
+            itemcode:'',
+            sortcode:'',
+            description:''
+          }],
+          form: {
+            itemname: '',
+            itemvalue: '',
+            sortcode: 0,
+            description: '',
+            itemid:''
+          },
+          formcontents:{
+            parentid: '',
+            itemname: '',
+            itemcode: '',
+            sortcode:'',
+            description: '',
+          },
+          formEdit:{
+            parentid: '',
+            itemname: '',
+            itemcode: '',
+            sortcode:'',
+            description: '',
+          },
+          dialogFormVisible: false,
+          dialogTableVisible: false,
+          dialogContentsVisible:false,
+          dialogEditVisible:false,
+          formLabelWidth: '120px',
+          tableDatas:[],
+        }
+      },
+      methods:{
+        searchContent:function(){
+          this.tableSelect = [];
+          if(this.inputdetails == ''){
+            this.$api.dic.showform(this.itemparent2).then(response => {
+              this.$store.dispatch("setTable",response.data.data) ;
+            })
+          }else{
+            if(this.value == 1){
+              for(let i in this.tabledetails){
+                if(this.tabledetails[i].itemname){
+                  if(this.tabledetails[i].itemname.indexOf(this.inputdetails) != -1){
+                    this.tableSelect.push(this.tabledetails[i]);
+                  }
+                }
+              }
+              this.$store.commit("setTabledel",this.tableSelect);
+            }
+            if(this.value == 2){
+              for(let i in this.tabledetails){
+                if(this.tabledetails[i].itemvalue){
+                  if(this.tabledetails[i].itemvalue.indexOf(this.inputdetails) != -1){
+                    this.tableSelect.push(this.tabledetails[i]);
+                  }
+                }
+              }
+              this.$store.commit("setTabledel",this.tableSelect);
+            }
+          }
+        },
+        addDirtails(data){
+          this.dialogFormVisible = false;
+          this.form.itemid = this.itemparent;
+          console.log(data);
+          // let datamation = JSON.stringify(data);
+          // console.log(datamation);
+          this.$api.dic.saveItemDetial(data);
+        },
+        delForm:function(){
+          this.$api.dic.deleteform(this.handleChangeValue.id);
+        },
+        getDataTable:function(){
+          this.dialogEditVisible=true;
+          this.formEdit=this.handleChangeValue;
+          this.formEdit.itemname=this.handleChangeValue.item;
+          this.selected2=this.formEdit.parent.id;
+        },
+        dictable:function(){
+          this.dialogTableVisible = true;
+          this.options=[];
+          this.dataOptions()
+        },
+        dataOptions:function(){
+          for(let i in this.navigation){
+            const node= {
+              id : this.navigation[i].id,
+              itemcode:this.navigation[i].itemcode,
+              item:this.navigation[i].item,
+              children:[]
+            };
+            for(let j in this.navigation[i].children) {
+              const node1 = {
+                id: this.navigation[i].children[j].id,
+                itemcode: this.navigation[i].children[j].itemcode,
+                item: this.navigation[i].children[j].item,
+                children:[]
+              };
+              node.children.push(node1);
+              if(node1.children.length > 0){
+                for (let k in this.navigation[i].children[j].children[k]){
+                  const node2 = {
+                    id: this.navigation[i].children[j].children[k].id,
+                    itemcode: this.navigation[i].children[j].children[k].itemcode,
+                    item: this.navigation[i].children[j].children[k].item,
+                    children:[]
+                  };
+                  node1.children.push(node2);
+                }
+              }
+            }
+            this.options.push(node);
+          }
+          console.log(this.options.length)
+        },
+        addcontents:function (){
+          this.dialogContentsVisible = true
+        },
+        addtable:function (data) {
+          this.dialogContentsVisible=false;
+          this.formcontents.parentid=this.selected;
+          console.log(this.formcontents);
+          let datamation = JSON.stringify(data);
+          console.log(datamation);
+          this.$api.dic.addform(datamation).then(response => {
+            console.log(response.data.data);
+            if (res.id == 0) {
+              this.navigation.push(res);
+            } else {
+              for (let i in this.navigation) {
+                if (this.navigation[i].id == res.id) {
+                  this.navigation[i].push(res);
+                } else if (this.navigation[i].children.length > 0) {
+                  for (let j in this.navigation[i]) {
+                    if (this.navigation[i].children[j].id == res.id) {
+                      this.navigation[i].children[j].push(res);
+                    }
+                  }
+                }
+              }
+            }
+          })
+        },
+        updateEdit:function(){
+          this.dialogEditVisible=false;
+          this.$api.dic.updateform(JSON.stringify(this.formEdit)).then(res =>{console.log(res)});
+          this.formEdit
+        },
+        searchall:function(){
+          console.log(this.inputform)
+          this.$api.dic.searchform(this.inputform).then(res => {
+            // navigation3[0].item = res.data.itemname;
+            // navigation3[0].itemcode = res.data.itemcode;
+            // navigation3[0].sortcode = res.data.sortcode;
+            // navigation3[0].description = res.data.description;
+            console.log(res)
+            // this.$store.commit("setnavigation2",data)
+          })
+        }
+      },
+      computed:{
+        navigation:function () {
+          this.navigations = this.$store.getters.navigation;
+          return this.navigations;
+        },
+        itemcode:function () {
+          this.itemcodes = this.$store.getters.itemcode;
+          return this.itemcodes;
+        },
+        handleChangeValue:function () {
+          this.currentRows = this.$store.getters.currentRow;
+          return this.currentRows;
+        },
+        itemparent:function () {
+          return this.$store.getters.itemparent2;
+        },
+        tabledetails(){
+          return this.$store.getters.tabledel;
+        },
+        itemparent2:function () {
+          return this.$store.getters.itemparent;
+        }
+      },
+    }
+</script>
+
+<style scoped>
+  #dirheader{
+    height: 80px;
+  }
+  .dirname{
+    height: 30px;
+    line-height: 30px;
+    border-bottom: 1px solid #c5c9cf;
+    font-size: 12px;
+  }
+  .dirname span{
+    float: left;
+  }
+  .dirchoose{
+    height: 50px;
+  }
+  .dirchoose>*{
+    margin-top: 8px;
+  }
+  .choinp,.chosel,.choser{
+    display: inline-block;
+    float: left;
+  }
+  .chosel{
+    width: 100px;
+  }
+  .choinp{
+    width: 200px;
+    margin-left: 2px;
+    margin-right: 2px;
+  }
+  .cho2{
+    float: right;
+    margin-right: 10px;
+  }
+  .cho2 div{
+    float: right;
+  }
+</style>

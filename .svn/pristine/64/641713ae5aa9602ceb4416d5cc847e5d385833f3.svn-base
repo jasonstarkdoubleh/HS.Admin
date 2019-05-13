@@ -1,0 +1,577 @@
+<template>
+  <div id="tableheader">
+    <div id="dirheader">
+      <div class="dirname">
+        <span>组织机构</span>
+      </div>
+      <div class="dirchoose">
+        <div class="chosel">
+          <el-select v-model="value" placeholder="请选择" size="small">
+            <el-option
+              v-for="item in options1"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"/>
+          </el-select>
+        </div>
+        <div class="choinp">
+          <el-input v-model="inputdetails" placeholder="请输入内容" size="small"/>
+        </div>
+        <div class="choser">
+          <el-button type="primary" icon="el-icon-search" size="small" @click="searchContent">搜索</el-button>
+        </div>
+        <div class="cho2">
+          <kt-button type="danger" size="small" @click="addOrganize" label="新增" icon="el-icon-plus" styleaction="margin-left: 1px" perms="mail:update"></kt-button>
+          <kt-button type="success" size="small" @click="edit" label="编辑" icon="el-icon-edit" styleaction="margin-left: 1px" perms="mail:update"></kt-button>
+          <kt-button type="warning" size="small" @click="delDetails" label="删除" icon="el-icon-delete" styleaction="margin-left: 1px" perms="mail:update"></kt-button>
+          <!--<el-button type="danger" plain size="small" icon="el-icon-plus" style="margin-left: 1px" @click="addOrganize">新增</el-button>-->
+          <!--<el-button type="success" plain size="small" icon="el-icon-edit" style="margin-left: 1px" @click="edit">编辑</el-button>-->
+          <!--<el-button type="warning" plain size="small" icon="el-icon-delete" style="margin-left: 1px" @click="delDetails">删除</el-button>-->
+        </div>
+      </div>
+    </div>
+
+    <el-dialog title="添加机构" :visible.sync="dialogFormVisible" width="600px" class="editFormOrg">
+      <el-form :model="form" :inline="true" size="mini" :rules="rules" ref="form">
+        <el-form-item label="公司名称" prop="username">
+          <el-input v-model="form.fullname"></el-input>
+        </el-form-item>
+        <el-form-item label="电话" prop="mobile">
+          <el-input v-model="form.outerphone"></el-input>
+        </el-form-item>
+        <el-form-item label="外文名称">
+          <el-input v-model="form.encode"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="form.email"></el-input>
+        </el-form-item>
+        <el-form-item label="经营范围">
+          <el-input v-model="form.businessscope"></el-input>
+        </el-form-item>
+        <el-form-item label="邮编">
+          <el-input v-model="form.postalcode"></el-input>
+        </el-form-item>
+        <el-form-item label="成立时间">
+          <el-date-picker
+            v-model="timeValue"
+            type="date"
+            style="width: 180px"
+            format="yyyy 年 MM 月 dd 日">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="传真">
+          <el-input v-model="form.fax"></el-input>
+        </el-form-item>
+        <el-form-item label="公司性质">
+          <treelist v-model="nature" :props="defaultProps" :options="companyNature" placeholder="请选择"></treelist>
+        </el-form-item>
+        <el-form-item label="权限">
+          <el-input  v-model="form.description"></el-input>
+        </el-form-item>
+        <el-form-item label="上级公司">
+          <treelist v-model="upcompany" :props="defaultProps" :options="orglist" placeholder="请选择"></treelist>
+        </el-form-item>
+        <el-form-item label="官网">
+          <el-input v-model="form.webaddress"></el-input>
+        </el-form-item>
+        <el-form-item label="负责公司">
+          <treelist v-model="manager" :props="defaultProps" :options="orglist" placeholder="请选择" style="padding: -15px"></treelist>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input  v-model="form.description"></el-input>
+        </el-form-item>
+        <el-form-item label="公司地址">
+          <china-area></china-area>
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="addre"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addCompany('form')">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="编辑机构" :visible.sync="dialogEditVisible" width="600px" class="editFormOrg">
+      <el-form :model="formEdit" :inline="true" size="mini">
+
+        <el-form-item label="公司名称">
+          <el-input v-model="formEdit.fullname"></el-input>
+        </el-form-item>
+        <el-form-item label="电话">
+          <el-input v-model="formEdit.outerphone"></el-input>
+        </el-form-item>
+        <el-form-item label="外文名称">
+          <el-input v-model="formEdit.encode"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="formEdit.email"></el-input>
+        </el-form-item>
+        <el-form-item label="经营范围">
+          <el-input v-model="formEdit.businessscope"></el-input>
+        </el-form-item>
+        <el-form-item label="邮编">
+          <el-input v-model="formEdit.postalcode"></el-input>
+        </el-form-item>
+        <el-form-item label="成立时间">
+          <el-date-picker
+            v-model="timeValue"
+            type="date"
+            style="width: 180px"
+            format="yyyy 年 MM 月 dd 日">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="传真">
+          <el-input v-model="formEdit.fax"></el-input>
+        </el-form-item>
+        <el-form-item label="公司性质">
+          <treelist v-model="nature" :props="defaultProps" :options="companyNature" placeholder="请选择"></treelist>
+        </el-form-item>
+        <el-form-item label="权限">
+          <el-input  v-model="formEdit.description"></el-input>
+        </el-form-item>
+        <el-form-item label="上级公司">
+          <treelist v-model="upcompany" :props="defaultProps" :options="orglist" placeholder="请选择"></treelist>
+        </el-form-item>
+        <el-form-item label="官网">
+          <el-input v-model="formEdit.webaddress"></el-input>
+        </el-form-item>
+        <el-form-item label="负责公司">
+          <treelist v-model="manager" :props="defaultProps" :options="orglist" placeholder="请选择" style="padding: -15px"></treelist>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input  v-model="formEdit.description"></el-input>
+        </el-form-item>
+        <el-form-item label="公司地址">
+          <china-area></china-area>
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="addre"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogEditVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editCompany(formEdit)">确 定</el-button>
+      </div>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+  import treelist from '@/views/Core/treelist'
+  import treeTable from "@/views/Core/table/treeTable/treeTable"
+  import chinaArea from "@/views/Core/chinaArea"
+  import KtButton from "@/views/Core/KtButton";
+  export default {
+        name: "tableheader",
+      components:{ treelist ,treeTable,chinaArea,KtButton},
+      data:function () {
+        return {
+          rules:{
+            username: [
+              { required: true, message: '请输入公司名称', trigger: 'blur' },
+            ],
+            password: [
+              { required: true, message: '请输入密码', trigger: 'blur' },
+            ],
+            upcompany: [
+              { required: true, message: '请选择上级公司', trigger: 'blur' },
+            ],
+            openid: [
+              { required: true, message: '请选择服务公司', trigger: 'blur' },
+            ],
+            mobile: [
+              { required: true, message: '请填写正确的手机号码', trigger: 'blur' },
+              { min: 11, max: 11, message: '请填写正确的手机号码', trigger: 'blur' }
+            ],
+          },
+          lick:true,
+          lick2:true,
+          navdata:'',
+          orgLocal:'',
+          orgParent:'',
+          addre:'',
+          timeValue: '',
+          labelPosition: 'left',
+          options: [],
+          defaultProps: {
+            parent: 'itemcode',   // 父级唯一标识
+            value: 'id',          // 唯一标识
+            label: 'item',       // 标签显示
+            children: 'children', // 子级
+          },
+          upcompany:'',
+          manager:'',
+          options1: [{
+            value: 'fullname',
+            label: '公司名称'
+          }, {
+            value: 'encode',
+            label: '外文名称'
+          },{
+            value: 'manager',
+            label: '负责人'
+          }],
+          value:'fullname',
+          tableSelect:[],
+          inputdetails: '',
+          form: {
+            fullname: '',
+            encode: '',
+            nature:'',
+            createdate:'',
+            outerphone: '',
+            description:'',
+            parentid:'',
+            managerid:'',
+            address: '',
+            fax:'',
+            postalcode: '',
+            businessscope: '',
+            email: '',
+            webaddress:'',
+            organizeid:''
+          },
+          formEdit: {
+            fullname: '',
+            encode: '',
+            nature:'',
+            createdate:'',
+            outerphone: '',
+            description:'',
+            parentid:'',
+            managerid:'',
+            address: '',
+            fax:'',
+            postalcode: '',
+            businessscope: '',
+            email: '',
+            webaddress:'',
+            organizeid:'',
+          },
+          dialogFormVisible: false,
+          dialogEditVisible:false,
+          formLabelWidth: '120px',
+          nature:'',
+          companyNature:[{
+            itemcode: '国家机关',   // 父级唯一标识
+            id: '国家机关',          // 唯一标识
+            item: '国家机关',       // 标签显示
+            children: [], // 子级
+          },{
+            itemcode: '房地产',
+            id: '房地产',
+            item: '房地产',
+            children: [],
+          },{
+            itemcode: '建筑业',
+            id: '建筑业',
+            item: '建筑业',
+            children: [],
+          },{
+            itemcode: '社会服务业',
+            id: '社会服务业',
+            item: '社会服务业',
+            children: [],
+          },{
+            itemcode: '制造业',
+            id: '制造业',
+            item: '制造业',
+            children: [],
+          },{
+            itemcode: '互联网',
+            id: '互联网',
+            item: '互联网',
+            children: [],
+          },{
+            itemcode: '金融业',
+            id: '金融业',
+            item: '金融业',
+            children: [],
+          },{
+            itemcode: '其他业',
+            id: '其他业',
+            item: '其他业',
+            children: [],
+          }]
+        }
+      },
+      methods:{
+        searchContent:function(){
+            this.$api.dic.findOrganizes([this.value,this.inputdetails]).then((res) => {
+              this.$store.commit("setorglist2",[]);
+              console.log(res.data.data)
+              this.navdata = res.data.data;
+               for (let p in this.navdata){
+                 console.log(8)
+                 if(this.navdata[p].parentid ==0){
+                   this.lick = false
+                   console.log(1)
+                   break
+                 }
+               }
+               if(this.lick){
+                 for(let m in this.orglist2){
+                   if (this.orglist2[m].parentid == 0) {
+                     this.orgLocal = this.orglist2[m]
+                     this.navdata.push(this.orgLocal)
+                     console.log(2)
+                     break
+                   }
+                 }
+                 for(let n in this.orglist2){
+                   if(this.orglist2[n].organizeid == res.data.data[0].parentid){
+                     this.orgParent = this.orglist2[n];
+                     console.log(3)
+                     break
+                   }
+                 }
+                 for(let q in this.navdata){
+                   if(this.navdata[q].organizeid == this.orgParent.organizeid){
+                     this.lick2 = false
+                   }
+                 }
+                 if(this.lick2){
+                   this.navdata.push(this.orgParent)
+                 }
+               }
+              for(let j in this.navdata){
+                if(this.navdata[j].createdate){
+                  this.navdata[j].createdate = this.navdata[j].createdate.substring(0,10)
+                }
+              }
+              for (let i in this.navdata) {
+                if (this.navdata[i].parentid == "0") {
+                  const treenodes={children:[]};
+                  treenodes.fullname=this.navdata[i].fullname;
+                  treenodes.encode=this.navdata[i].encode;
+                  treenodes.nature=this.navdata[i].nature;
+                  treenodes.createdate=this.navdata[i].createdate;
+                  treenodes.outerphone=this.navdata[i].outerphone;
+                  treenodes.description=this.navdata[i].description;
+                  treenodes.parentid=this.navdata[i].parentid;
+                  treenodes.manager=this.navdata[i].manager;
+                  treenodes.managerid=this.navdata[i].managerid;
+                  treenodes.address=this.navdata[i].address;
+                  treenodes.fax=this.navdata[i].fax;
+                  treenodes.postalcode=this.navdata[i].postalcode;
+                  treenodes.businessscope=this.navdata[i].businessscope;
+                  treenodes.email=this.navdata[i].email;
+                  treenodes.webaddress=this.navdata[i].webaddress;
+                  treenodes.organizeid=this.navdata[i].organizeid;
+                  treenodes.provinceid=this.navdata[i].provinceid;
+                  treenodes.cityid=this.navdata[i].cityid;
+                  treenodes.countyid=this.navdata[i].countyid;
+                  this.getTree2(this.navdata[i], this.navdata, treenodes);
+                  console.log(treenodes)
+                  this.$store.dispatch("pushorglist2",treenodes)
+                }
+              }
+              this.lick =true;
+              this.lick2 = true
+            })
+        },
+        delDetails:function(){
+          if(!this.current.organizeid){
+            this.$message.error("请先选中数据在进行删除操作")
+          }else {
+            this.$confirm('此操作将删除该数据, 是否继续?', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => {
+              this.$api.dic.delItemDetial(this.current.organizeid);
+            }).then(() => {
+              this.$message({
+                type: 'success',
+                message: '删除成功!'
+              });
+            }).catch(() => {
+              this.$message({
+                type: 'info',
+                message: '已取消删除'
+              });
+            });
+          }
+        },
+        addCompany:function (data) {
+          this.$refs[data].validate((valid) => {
+            if (valid) {
+              this.dialogFormVisible = false;
+              if(this.areaAddress.length > 0){
+                this.form.provinceid = this.areaAddress[0];
+                this.form.cityid = this.areaAddress[1];
+                this.form.countyid = this.areaAddress[2];
+              }
+              this.form.address = this.addre;
+              this.form.organizeid = this.current.organizeid;
+              this.form.parentid = this.upcompany;
+              this.form.managerid = this.manager;
+              this.form.nature = this.nature;
+              this.form.createdate = this.timeValue;
+              this.$api.dic.saveOrganize(data)
+            } else {
+              return false;
+            }
+          });
+          // if(this.form.fullname == ''){
+          //   this.$message.error('公司名称不能为空')
+          // }else{
+          //   this.dialogFormVisible = false;
+          //   if(this.areaAddress.length > 0){
+          //     this.form.provinceid = this.areaAddress[0];
+          //     this.form.cityid = this.areaAddress[1];
+          //     this.form.countyid = this.areaAddress[2];
+          //   }
+          //   this.form.address = this.addre;
+          //   this.form.organizeid = this.current.organizeid;
+          //   this.form.parentid = this.upcompany;
+          //   this.form.managerid = this.manager;
+          //   this.form.nature = this.nature;
+          //   this.form.createdate = this.timeValue;
+          //   this.$api.dic.saveOrganize(data)
+          // }
+        },
+        edit:function(){
+          if(!this.current){
+            this.$message.error("请先选中数据在进行编辑")
+          }else {
+            // console.log(this.current);
+            this.dialogEditVisible = true;
+            this.formEdit = this.current;
+            this.upcompany = this.current.parentid;
+            this.manager = this.current.managerid;
+            this.nature = this.current.nature;
+            this.timeValue = this.current.createdate;
+            this.$store.commit('setSelectedOptions',[this.current.provinceid,this.current.cityid,this.current.countyid]);
+            this.addre = this.current.address
+          }
+        },
+        editCompany:function (data) {
+          if(this.formEdit.fullname == ''){
+            this.$message.error('公司名称不能为空')
+          }else{
+            this.dialogEditVisible = false;
+            this.formEdit.address = this.addre;
+            if(this.areaAddress.length > 0){
+              this.formEdit.provinceid = this.areaAddress[0];
+              this.formEdit.cityid = this.areaAddress[1];
+              this.formEdit.countyid = this.areaAddress[2];
+            }
+            this.formEdit.address = this.addre;
+            this.formEdit.parentid = this.upcompany;
+            this.formEdit.managerid = this.manager;
+            this.formEdit.nature = this.nature;
+            this.formEdit.createdate = this.timeValue;
+            delete this.formEdit.parent;
+            delete this.formEdit.children;
+            // console.log(data);
+            this.$api.dic.updateOrganize(data)
+          }
+        },
+        addOrganize:function () {
+          this.dialogFormVisible = true;
+          this.upcompany = '';
+          this.manager = '';
+          this.nature = '';
+          this.timeValue = '';
+        },
+        getTree2:function ( a,b,c ){
+          for (let i in b) {
+            if (a.organizeid === b[i].parentid) {
+              const  d={};
+              d.fullname=b[i].fullname;
+              d.encode=b[i].encode;
+              d.nature=b[i].nature;
+              d.createdate=b[i].createdate;
+              d.outerphone=b[i].outerphone;
+              d.description=b[i].description;
+              d.parentid=b[i].parentid;
+              d.manager=b[i].manager;
+              d.managerid=b[i].managerid;
+              d.address=b[i].address;
+              d.fax=b[i].fax;
+              d.postalcode=b[i].postalcode;
+              d.businessscope=b[i].businessscope;
+              d.email=b[i].email;
+              d.webaddress=b[i].webaddress;
+              d.organizeid=b[i].organizeid;
+              d.provinceid=b[i].provinceid;
+              d.cityid=b[i].cityid;
+              d.countyid=b[i].countyid;
+              d.children=[];
+              this.getTree2(b[i], b, d);
+              c.children.push(d);
+            }
+          }
+        }
+      },
+      computed:{
+        orglist:function () {
+          return this.$store.getters.orglist;
+        },
+        current:function () {
+          return this.$store.getters.currentRow;
+        },
+        itemparent:function () {
+          return this.$store.getters.itemparent;
+        },
+        orgall:function () {
+          return this.$store.getters.orgall;
+        },
+        areaAddress:function () {
+          return this.$store.getters.address;
+        },
+        orglist2:function () {
+          return this.$store.getters.OrgName
+        },
+      },
+      created:function() {
+        // this.value = this.options[0].label
+      }
+  }
+</script>
+
+<style scoped>
+  #tableheader{
+    min-width: 1100px;
+  }
+  #dirheader{
+    height: 80px;
+  }
+  .dirname{
+    height: 30px;
+    line-height: 30px;
+    border-bottom: 1px solid #c5c9cf;
+    font-size: 12px;
+  }
+  .dirname span{
+    float: left;
+  }
+  .dirchoose{
+    height: 50px;
+  }
+  .dirchoose>*{
+    margin-top: 8px;
+  }
+  .choinp,.chosel,.choser{
+    display: inline-block;
+    float: left;
+  }
+  .chosel{
+    width: 100px;
+  }
+  .choinp{
+    width: 200px;
+    margin-left: 2px;
+    margin-right: 2px;
+  }
+  .cho2{
+    float: right;
+    margin-right: 10px;
+  }
+  .cho2 div{
+    float: right;
+  }
+</style>

@@ -1,0 +1,168 @@
+<template>
+  <div id="tablemain">
+    <div id="dirtable">
+      <el-table
+        :data="tabledetails"
+        border
+        highlight-current-row
+        @current-change="handleCurrentChange"
+        style="width: 100%">
+        <el-table-column
+          v-for="item in tablecols"
+          :key="item.label"
+          :type="item.type"
+          :width="item.width"
+          :prop="item.value"
+          :label="item.label">
+        </el-table-column>
+        <el-table-column label="actions" align="center">
+          <template slot-scope="scope">
+            <el-button type="primary" size="mini" @click="editDirtails">编辑</el-button>
+            <el-button type="success" size="mini" @click="dialogFormDetails = true">详细</el-button>
+            <el-button type="danger" size="mini" @click="delForm">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+    <el-dialog title="字典编辑" :visible.sync="dialogFormVisible" readonly>
+      <el-form ref="form" :model="form" label-width="80px">
+        <el-form-item label="项目名">
+          <el-input v-model="form.itemname" ></el-input>
+        </el-form-item>
+        <el-form-item label="项目值">
+          <el-input v-model="form.itemvalue"></el-input>
+        </el-form-item>
+        <el-form-item label="排序">
+          <el-input v-model="form.sortcode"></el-input>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input type="textarea" v-model="form.description"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editTrue(form)">确 定</el-button>
+      </div>
+    </el-dialog>
+    <el-dialog title="字典详情" :visible.sync="dialogFormDetails" readonly>
+      <el-form ref="form" :model="form" label-width="80px">
+        <el-form-item label="项目名">
+          <el-input v-model="form.itemname" readonly></el-input>
+        </el-form-item>
+        <el-form-item label="项目值">
+          <el-input v-model="form.itemvalue" readonly></el-input>
+        </el-form-item>
+        <el-form-item label="排序">
+          <el-input v-model="form.sortcode" readonly></el-input>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input type="textarea" v-model="form.description" readonly></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormDetails = false">取 消</el-button>
+        <el-button type="primary" @click="dialogFormDetails = false">确 定</el-button>
+      </div>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+    export default {
+        name: "tablebody",
+      data() {
+        return {
+          delData:'',
+          readonly:true,
+          dialogFormVisible:false,
+          dialogFormDetails:false,
+          form: {
+            itemname: '',
+            itemvalue: '',
+            sortcode: '',
+            description: '',
+            parentid:''
+          },
+          tabledel:[],
+          tablecols: [{
+            type:'selection',
+            width:'100px',
+            label:'',
+            value:''
+          },{
+            type:'',
+            width:'100px',
+            label:'项目名',
+            value:'itemname'
+          },{
+            type:'',
+            width:'100px',
+            label:'项目值',
+            value:'itemvalue'
+          },{
+            type:'',
+            width:'100px',
+            label:'排序',
+            value:'sortcode'
+          },{
+            type:'',
+            width:'100px',
+            label:'有效',
+            value:'delivery'
+          },{
+            type:'',
+            width:'150px',
+            label:'备注',
+            value:'description'
+          }],
+          tableBut: [{
+            type: 'primary',
+            size: 'mini',
+            status: true,
+            name: '编辑'
+          }, {
+            type: 'danger',
+            size: 'mini',
+            status: true,
+            name: '详细'
+          }, {
+            type: 'success',
+            size: 'mini',
+            status: true,
+            name: '删除'
+          }],
+        }
+      },
+      methods:{
+        delForm:function(){
+          this.$api.dic.deleteItemDetial(this.delData);
+        },
+        editDirtails:function(){
+          this.dialogFormVisible = true;
+        },
+        handleCurrentChange:function (val) {
+          this.form.itemname = val.itemname;
+          this.form.itemvalue = val.itemvalue;
+          this.form.sortcode = val.sortcode;
+          this.form.description = val.description;
+          this.delData = val.itemId;
+        },
+        editTrue:function (data) {
+          this.dialogFormVisible = false;
+          var datamation = JSON.stringify(data);
+          this.$api.dic.updateItemDetial(datamation)
+
+        }
+      },
+      computed:{
+        tabledetails(){
+          this.tabledel = this.$store.getters.tabledel;
+          return this.tabledel;
+        }
+      }
+    }
+</script>
+
+<style scoped>
+
+</style>

@@ -1,0 +1,118 @@
+<template>
+  <div id="tablemain" :style="{height:clientHeight}">
+    <el-table :data="orglist"
+              stripe
+              size="mini"
+              style="width: 100%;">
+      <table-tree-column prop="fullname"
+                         header-align="center"
+                         treeKey="parentid"
+                         width="150"
+                         label="名称">
+      </table-tree-column>
+      <el-table-column prop="nature"
+                       header-align="center"
+                       align="center"
+                       width="120"
+                       label="企业类型">
+      </el-table-column>
+      <el-table-column prop="email"
+                       header-align="center"
+                       align="center"
+                       label="邮箱">
+      </el-table-column>
+    </el-table>
+  </div>
+</template>
+
+<script>
+  import TableTreeColumn from "@/views/Core/TableTreeColumn";
+    export default {
+        name: "tablebody",
+      components:{TableTreeColumn},
+      data:function () {
+        return {
+          tablecols: [{
+            type:'',
+            width:'230px',
+            label:'公司名称',
+            value:'fullname'
+          },{
+            type:'',
+            width:'120px',
+            label:'外文名称',
+            value:'encode'
+          },{
+            type:'',
+            width:'100px',
+            label:'公司性质',
+            value:'nature'
+          },{
+            type:'',
+            width:'150px',
+            label:'成立时间',
+            value:'createdate'
+          },{
+            type:'',
+            width:'100px',
+            label:'负责人',
+            value:'manager'
+          },{
+            type:'',
+            width:'150px',
+            label:'经营范围',
+            value:'outerphone'
+          },{
+            type:'',
+            width:'',
+            label:'备注',
+            value:'description'
+          }],
+          tableBut: [{
+            type: 'primary',
+            size: 'mini',
+            status: true,
+            name: '编辑'
+          }, {
+            type: 'danger',
+            size: 'mini',
+            status: true,
+            name: '详细'
+          }, {
+            type: 'success',
+            size: 'mini',
+            status: true,
+            name: '删除'
+          }],
+        }
+      },
+      methods:{
+        handleCurrentChange:function (val) {
+          console.log(val)
+          this.$store.commit("setCurrent",val)
+        }
+      },
+      computed:{
+        // tabledel:function () {
+        //   // console.log(this.$store.getters.tabledel);
+        //   return this.$store.getters.tabledel
+        // },
+        // orgall:function () {
+        //   console.log(this.$store.getters.orgall);
+        //   return this.$store.getters.orgall
+        // },
+        orglist:function () {
+          console.log(this.$store.getters.orglist2);
+          return this.$store.getters.orglist2
+        },
+        clientHeight:function(){
+          console.log(this.$store.getters.clientHeight + 'px')
+          return this.$store.getters.clientHeight -90+'px'
+        },
+      }
+    }
+</script>
+
+<style scoped>
+
+</style>

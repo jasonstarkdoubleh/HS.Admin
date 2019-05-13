@@ -1,0 +1,27 @@
+<template>
+  <el-container>
+    <el-header style="height: 60px">
+    <tableheader></tableheader>
+    </el-header>
+    <el-main>
+      <tablebody></tablebody>
+    </el-main>
+    <el-footer>
+      <tablefooter></tablefooter>
+    </el-footer>
+  </el-container>
+</template>
+
+<script>
+  import tableheader from './tabelheader'
+  import tablebody from './tablebody'
+  import tablefooter from './tablefooter'
+  export default {
+        name: "tablemain",
+      components:{tableheader,tablebody,tablefooter}
+    }
+</script>
+
+<style scoped>
+
+</style>

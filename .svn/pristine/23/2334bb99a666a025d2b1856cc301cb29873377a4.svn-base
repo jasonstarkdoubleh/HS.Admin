@@ -1,0 +1,93 @@
+<template>
+  <div id="tablemain">
+    <div id="dirtable">
+      <el-table
+        :data="tabledetails"
+        border
+        highlight-current-row
+        style="width: 100%">
+        <el-table-column
+          v-for="item in tablecols"
+          :key="item.label"
+          :type="item.type"
+          :width="item.width"
+          :prop="item.value"
+          :label="item.label">
+        </el-table-column>
+        <el-table-column label="actions" align="center">
+          <template slot-scope="scope">
+            <el-button v-for="item in tableBut" v-if="item.status" :key="item.name" :size="item.size" :type="item.type">{{ item.name }}</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+  </div>
+</template>
+
+<script>
+    export default {
+        name: "tablebody",
+      data:function () {
+        return {
+          tabledel:[],
+          tablecols: [{
+            type:'selection',
+            width:'100px',
+            label:'',
+            value:''
+          },{
+            type:'',
+            width:'100px',
+            label:'项目名',
+            value:'itemname'
+          },{
+            type:'',
+            width:'100px',
+            label:'项目值',
+            value:'itemvalue'
+          },{
+            type:'',
+            width:'100px',
+            label:'排序',
+            value:'sortcode'
+          },{
+            type:'',
+            width:'100px',
+            label:'有效',
+            value:'delivery'
+          },{
+            type:'',
+            width:'150px',
+            label:'备注',
+            value:'description'
+          }],
+          tableBut: [{
+            type: 'primary',
+            size: 'mini',
+            status: true,
+            name: '编辑'
+          }, {
+            type: 'danger',
+            size: 'mini',
+            status: true,
+            name: '详细'
+          }, {
+            type: 'success',
+            size: 'mini',
+            status: true,
+            name: '删除'
+          }],
+        }
+      },
+      computed:{
+        tabledetails(){
+          this.tablebody = this.$store.getters.tabledel;
+          return this.tablebody;
+        }
+      }
+    }
+</script>
+
+<style scoped>
+
+</style>

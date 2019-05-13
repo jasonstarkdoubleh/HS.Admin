@@ -1,0 +1,76 @@
+<template>
+  <div id="dirhigh" style="margin-top: -6px">
+    <el-container style="border: 1px solid #eee">
+      <el-aside width="202px" :height="clientHeight" style="background-color: rgb(238, 241, 246);color: #333">
+        <dictionaryAside></dictionaryAside>
+      </el-aside>
+      <el-main style="padding-top: 0px">
+        <dictionaryMain></dictionaryMain>
+      </el-main>
+    </el-container>
+  </div>
+</template>
+
+<script>
+  import dictionaryAside from './dictionaryAside'
+  import dictionaryMain from './dictionaryMain'
+export default {
+    name:"dictionary",
+    data:function(){
+      return {
+        navdata:'',
+      }
+    },
+  components: { dictionaryAside ,dictionaryMain },
+  methods:{
+    getTree( a,b,c ) {
+      for (let i in b) {
+        if (a.itemid === b[i].parentid) {
+          const  d={children: []};
+          d.item=b[i].itemname;
+          d.id=b[i].itemid;
+          d.itemcode=b[i].itemcode;
+          d.sortcode=b[i].sortcode;
+          d.description=b[i].description;
+          this.getTree(b[i], b, d);
+          c.children.push(d);
+        }
+      }
+    },
+    getAsidedata:function (){
+      this.$store.commit('setNavigation',[]);
+      this.$api.dic.getAside().then(response => {
+        this.navdata = response.data.data;
+        console.log(this.navdata);
+        for (let i in this.navdata) {
+          if (this.navdata[i].parentid === '0') {
+            const treenodes={item:"",id:"",itemcode:'',sortcode:'',description:'',children:[]};
+            treenodes.item=this.navdata[i].itemname;
+            treenodes.id=this.navdata[i].itemid;
+            treenodes.itemcode=this.navdata[i].itemcode;
+            treenodes.sortcode=this.navdata[i].sortcode;
+            treenodes.description=this.navdata[i].description;
+            this.getTree(this.navdata[i], this.navdata, treenodes);
+            console.log(treenodes);
+            this.$store.dispatch("pushNav",treenodes)
+          }
+        }
+        // console.log(this.$store.getters.navigation);
+      })
+    },
+  },
+  computed:{
+    clientHeight:function(){
+      console.log(this.$store.getters.clientHeight+'px');
+      return this.$store.getters.clientHeight+'px'
+    }
+  },
+  created:function () {
+    this.getAsidedata();
+  }
+}
+</script>
+
+<style scoped>
+
+</style>

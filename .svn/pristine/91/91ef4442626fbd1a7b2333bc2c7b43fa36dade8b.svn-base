@@ -1,0 +1,47 @@
+<template>
+    <div id="tableaside">
+      <el-menu :default-openeds="opendir">
+        <el-submenu v-for="nav in navigation" :key="nav.item" :index="nav.item">
+          <template slot="title"><i class="el-icon-message"/>{{ nav.item }}</template>
+          <el-menu-item v-for="child in nav.children" :key="child.id" :index="child.id" @click="getcode(child.itemcode)">{{ child.item }}</el-menu-item>
+        </el-submenu>
+      </el-menu>
+    </div>
+</template>
+
+<script>
+  // import { showform } from '@/api/dic'
+    export default {
+        name: "tableaside",
+      data(){
+          return {
+            navigations:[]
+          }
+      },
+      methods:{
+        getcode(data){
+          this.$store.commit("setitemparent",data);
+          this.$api.dic.showform(data).then(response => {
+            this.$store.dispatch("setTable",response.data.data) ;
+          })
+          },
+      },
+      computed: {
+        navigation:function(){
+          this.navigations = this.$store.getters.navigation;
+          return this.navigations;
+        },
+        opendir: function() {
+          const openlist = [];
+          for (let i = 0; i < this.navigation.length; i++) {
+            openlist.push(this.navigation[i].item)
+          }
+          return openlist
+        }
+      },
+    }
+</script>
+
+<style scoped>
+
+</style>

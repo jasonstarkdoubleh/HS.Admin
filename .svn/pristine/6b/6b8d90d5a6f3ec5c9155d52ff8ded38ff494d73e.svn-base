@@ -1,0 +1,172 @@
+<template>
+  <div id="tablemain" style="height: 450px">
+    <el-scrollbar style="height: 100%">
+    <div id="dirtable">
+      <el-table
+        :data="userInfos"
+        border
+        highlight-current-row
+        @current-change="handleCurrentChange"
+        style="width: 100%">
+        <el-table-column
+          type="index"
+          width="50">
+        </el-table-column>
+        <el-table-column
+          v-for="item in tablecols"
+          :key="item.label"
+          :type="item.type"
+          :width="item.width"
+          :prop="item.value"
+          :label="item.label">
+        </el-table-column>
+        <!--<el-table-column-->
+          <!--v-for="item in tablecols"-->
+          <!--:key="item.label"-->
+          <!--:type="item.type"-->
+          <!--:width="item.width"-->
+          <!--:prop="item.value"-->
+          <!--:label="item.label">-->
+        <!--</el-table-column>-->
+        <!-- <el-table-column label="actions" align="center">
+          <template slot-scope="scope">
+            <el-button v-for="item in tableBut" v-if="item.status" :key="item.name" :size="item.size" :type="item.type">{{ item.name }}</el-button>
+          </template>
+        </el-table-column> -->
+      </el-table>
+    </div>
+    <!--<div class="block">-->
+      <!--<el-pagination-->
+        <!--@current-change="current_change"-->
+        <!--layout="prev, pager, next"-->
+        <!--:page-size="20"-->
+        <!--:total="userArray">-->
+      <!--</el-pagination>-->
+    <!--</div>-->
+      <div class="block">
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="current_change"
+          :page-sizes="[20, 30, 40]"
+          :page-size="pageArrray"
+          :current-page="defaultPage"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="userArray">
+        </el-pagination>
+      </div>
+    </el-scrollbar>
+  </div>
+</template>
+
+<script>
+    export default {
+        name: "tablebody",
+      data:function () {
+        return {
+          defaultPage:'1',
+          pageArrray:'20',
+          tablecols: [{
+            type:'',
+            width:'140px',
+            label:'账户',
+            value:'username'
+          },{
+            type:'',
+            width:'100px',
+            label:'姓名',
+            value:'realname'
+          },{
+            type:'',
+            width:'60px',
+            label:'性别',
+            value:'gender'
+          },{
+            type:'',
+            width:'120px',
+            label:'手机',
+            value:'mobile'
+          },{
+            type:'',
+            width:'150px',
+            label:'公司',
+            value:'organizename'
+          },{
+              type:'',
+              width:'100px',
+              label:'岗位',
+              value:'dutyname'
+            },{
+              type:'',
+              width:'180px',
+              label:'职位',
+              value:'postname'
+            },{
+              type:'',
+              width:'100px',
+              label:'主管',
+              value:'manager'
+            },{
+              type:'',
+              width:'',
+              label:'备注',
+              value:'description'
+            }],
+          tableBut: [{
+            type: 'primary',
+            size: 'mini',
+            status: true,
+            name: '编辑'
+          }, {
+            type: 'danger',
+            size: 'mini',
+            status: true,
+            name: '详细'
+          }, {
+            type: 'success',
+            size: 'mini',
+            status: true,
+            name: '删除'
+          },{
+            type:'',
+            width:'',
+            label:'备注',
+            value:'description'
+          }],
+        }
+      },
+      props:['userArray'],
+      methods:{
+        handleSizeChange(val) {
+          this.pageArrray = val;
+          let startPage = (this.defaultPage-1)*this.pageArrray;
+          this.$api.dic.getUerPage('start='+startPage+'&length='+this.pageArrray).then(
+            res => {
+              this.$store.commit("setUserInfo",res.data.data.data);
+            }
+          )
+        },
+        handleCurrentChange:function (val) {
+          console.log(val);
+          this.$store.commit("setCurrent",val)
+        },
+        current_change:function (val) {
+          console.log(val);
+          let startPage = (val-1)*this.pageArrray;
+          this.$api.dic.getUerPage('start='+startPage+'&length='+this.pageArrray).then(
+            res => {
+              this.$store.commit("setUserInfo",res.data.data.data);
+            }
+          )
+        }
+      },
+      computed:{
+        userInfos:function () {
+          return this.$store.getters.userInfo
+        }
+      }
+    }
+</script>
+
+<style scoped>
+
+</style>

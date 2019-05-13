@@ -1,0 +1,139 @@
+const dir = {
+  state: {
+    navigation: [],
+    itemcode: '',
+    tabledel: [],
+    currentRow: '',
+    navigation2: [],
+    orgForm: [],
+    orgall:[],
+    orglist:[],
+    orglist2:[],
+    current:'',
+    userInfo:[],
+    itemparent:'',
+    itemparent2:'',
+    itemparent3:'',
+    address:[],
+    clientHeight:'',
+    total:'',
+    selectedOptions:[],
+    OrgName:[],
+    permiss:[]
+  },
+  mutations: {
+    setSelectedOptions(state,data){
+      state.selectedOptions = data;
+    },
+    setTotal(state,data){
+      state.total = data
+    },
+    setNavigation(state, data) {
+      state.navigation = data
+    },
+    pushNavigation(state, data) {
+      state.navigation.push(data)
+    },
+    updateNavigation(state,data){
+      state.navigation[data[0]] = data[1]
+    },
+    newNavigation(state,data){
+      state.navigation.splice(0,1,data)
+    },
+    setclientHeight(state,data){
+      state.clientHeight = data - 60
+    },
+    setTabledel(state, data) {
+      state.tabledel = data
+    },
+    setItemcode(state, data) {
+      state.itemcode = data
+    },
+    setCurrentRow(state, data) {
+      state.currentRow = data
+    },
+    setsetnavigation2(state, data) {
+      state.navigation2 = data
+    },
+    setOrgForm(state, data) {
+      state.orgForm = data
+    },
+    setorg(state,data){
+      state.orgall = data
+    },
+    setorgdate(state,data){
+      state.orgall[data[0]]["createdate"] = data[1]
+    },
+    addorglist(state,data){
+      state.orglist.push(data);
+    },
+    addorglist2(state,data){
+      state.orglist2.push(data);
+    },
+    setCurrent(state,data){
+      state.current = data;
+    },
+    setUserInfo(state,data){
+      state.userInfo = data;
+      for(let i in state.userInfo){
+        if(state.userInfo[i].gender == 1){
+          state.userInfo[i].gender = '男'
+        }else {
+          state.userInfo[i].gender = '女'
+        }
+      }
+    },
+    setitemparent(state,data){
+      state.itemparent = data;
+    },
+    setitemparent2(state,data){
+      state.itemparent2 = data;
+    },
+    setitemparent3(state,data){
+      state.itemparent3 = data;
+    },
+    setorglist(state,data){
+      state.orglist = data;
+    },
+    setorglist2(state,data){
+      state.orglist2 = data;
+    },
+    setAdrress(state,data){
+      state.address = data;
+    },
+    setOrgNmaeM(state,data){
+      state.OrgName = data;
+    },
+    setpermission(state,data){
+      state.permiss = data;
+    },
+  },
+  actions: {
+    setOrgName({ commit },data){
+      commit('setOrgNmaeM',data)
+    },
+    pushNav({ commit }, data) {
+      commit('pushNavigation', data)
+    },
+    setTable({ commit }, data) {
+      commit('setTabledel', data)
+    },
+    setorgall({ commit },data){
+      commit('setorg',data)
+    },
+    pushorglist({ commit },data){
+      commit('addorglist',data)
+    },
+    pushorglist2({ commit },data){
+      commit('addorglist2',data)
+    },
+    setUser({ commit },data){
+      commit("setUserInfo",data)
+    },
+    setpermiss({commit},data){
+      commit('setpermission',data)
+    }
+  }
+};
+
+export default dir

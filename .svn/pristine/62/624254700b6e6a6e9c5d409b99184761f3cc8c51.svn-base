@@ -1,0 +1,61 @@
+<template>
+    <div id="tableaside">
+      <div class="dirname">
+        <span>字典分类</span>
+      </div>
+      <el-menu>
+        <el-submenu v-for="nav in navigation" :key="nav.item" :index="nav.item">
+          <template slot="title"><i class="el-icon-message"/>{{ nav.item }}</template>
+          <el-menu-item v-for="child in nav.children" :key="child.id" :index="child.id" @click="getcode(child.itemcode,child.id,child.item)">{{ child.item }}</el-menu-item>
+        </el-submenu>
+      </el-menu>
+    </div>
+</template>
+
+<script>
+  // import { showform } from '@/api/dic'
+    export default {
+        name: "tableaside",
+      data(){
+          return {
+            navigations:[]
+          }
+      },
+      methods:{
+        getcode(data,data2,data3){
+          this.$store.commit("setitemparent",data);
+          this.$store.commit("setitemparent2",data2);
+          this.$store.commit("setitemparent3",data3);
+          this.$api.dic.showform(data).then(response => {
+            this.$store.dispatch("setTable",response.data.data) ;
+          })
+          },
+      },
+      computed: {
+        navigation:function(){
+          return this.$store.getters.navigation;
+        },
+        opendir: function() {
+          const openlist = [];
+          for (let i = 0; i < this.navigation.length; i++) {
+            openlist.push(this.navigation[i].item)
+          }
+          return openlist
+        }
+      },
+    }
+</script>
+
+<style scoped>
+  .dirname{
+    height: 30px;
+    line-height: 30px;
+    border-bottom: 1px solid #c5c9cf;
+    font-size: 12px;
+    background: #ffffff;
+  }
+  .dirname span{
+    float: left;
+    margin-left: 5px;
+  }
+</style>

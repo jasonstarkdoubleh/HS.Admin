@@ -1,0 +1,87 @@
+<template>
+  <div id="dirhigh" :style="{height : clientHeight}">
+    <el-container>
+      <el-header>
+        <useradminHeader></useradminHeader>
+      </el-header>
+      <el-main>
+        <useradminBody :total="total"></useradminBody>
+      </el-main>
+    </el-container>
+  </div>
+</template>
+
+<script>
+  import useradminHeader from './useradminHeader'
+  import useradminBody from './useradminBody'
+  export default {
+    name:"Organiaze",
+    data:function(){
+      return {
+        navdata:'',
+        total:1
+      }
+    },
+  components: { useradminHeader,useradminBody },
+  methods:{
+    getTree( a,b,c ) {
+      for (let i in b) {
+        if (a.organizeid === b[i].parentid) {
+          const  d={};
+          d.item=b[i].fullname;
+          d.id=b[i].organizeid;
+          d.itemcode=b[i].parentid;
+          d.children=[];
+          this.getTree(b[i], b, d);
+          c.children.push(d);
+        }
+      }
+    },
+    getall:function(){
+      this.$store.commit('setorglist',[]);
+      this.$api.dic.getOrgAll().then(res => {
+        this.navdata = res.data.data;
+        for (let i in this.navdata) {
+          if (this.navdata[i].parentid == "0") {
+            const treenodes={item:"",id:"",itemcode:"",children:[]};
+            treenodes.item=this.navdata[i].fullname;
+            treenodes.id=this.navdata[i].organizeid;
+            treenodes.itemcode=this.navdata[i].parentid;
+            this.getTree(this.navdata[i], this.navdata, treenodes);
+            this.$store.dispatch("pushorglist",treenodes)
+          }
+        }
+      })
+    },
+    getUser:function () {
+      this.$api.dic.getUerPage('start=0&length=20').then(
+        res => {
+          console.log(res.data.data.data);
+          for(let i in res.data.data.data){
+            if(res.data.data.data[i].birthday){
+              res.data.data.data[i].birthday = res.data.data.data[i].birthday.substring(0,10)
+            }
+          }
+          // this.total = res.data.data.total;
+          this.$store.commit('setTotal',res.data.data.total)
+          this.$store.dispatch("setUser",res.data.data.data);
+        }
+      )
+    }
+  },
+    computed:{
+      clientHeight:function(){
+        console.log(this.$store.getters.clientHeight -5 +'px');
+        return this.$store.getters.clientHeight -5 +'px'
+      }
+    },
+  created:function () {
+    this.getall();
+    this.getUser();
+  }
+}
+</script>
+
+<style scoped>
+
+</style>

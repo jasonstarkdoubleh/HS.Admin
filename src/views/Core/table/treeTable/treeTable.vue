@@ -1,0 +1,50 @@
+<template>
+  <div class="app-container">
+    <tree-table :data="navication" :columns="columnsgo" border />
+  </div>
+</template>
+
+<script>
+import treeTable from '@/components/TreeTable'
+
+export default {
+  name: 'TreeTableDemo',
+  components: { treeTable },
+  data() {
+    return {
+      columnsgo:[
+        {
+          text: "名称",
+          value: "item",
+          width: 200
+        },
+        {
+          text: "编号",
+          value: "itemcode"
+        },
+        {
+          text: "排序",
+          value: "sortcode"
+        },
+        {
+          text: "备注",
+          value: "description"
+        }
+      ],
+    }
+  },
+  props:["navigation2"],
+  computed:{
+    navication:function () {
+      console.log(this.$store.getters.navigation);
+      return this.$store.getters.navigation;
+    },
+    // selectnav:function(){
+    //     return this.navication
+    // }
+  }
+}
+</script>
+<!--<el-tag style="margin-bottom:20px;">-->
+<!--<a href="https://github.com/PanJiaChen/vue-element-admin/tree/master/src/components/TreeTable" target="_blank">Documentation</a>-->
+<!--</el-tag>-->

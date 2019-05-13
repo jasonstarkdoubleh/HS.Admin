@@ -1,0 +1,198 @@
+<template>
+  <div id="tablemain">
+    <!--<div id="dirtable">-->
+      <!--<el-table-->
+        <!--:data="orgall"-->
+        <!--border-->
+        <!--highlight-current-row-->
+        <!--@current-change="handleCurrentChange"-->
+        <!--style="width: 100%">-->
+        <!--<el-table-column-->
+          <!--type="index"-->
+          <!--width="50">-->
+        <!--</el-table-column>-->
+        <!--<el-table-column-->
+          <!--v-for="item in tablecols"-->
+          <!--:key="item.label"-->
+          <!--:type="item.type"-->
+          <!--:width="item.width"-->
+          <!--:prop="item.value"-->
+          <!--:label="item.label">-->
+        <!--</el-table-column>-->
+        <!--&lt;!&ndash; <el-table-column label="actions" align="center">-->
+          <!--<template slot-scope="scope">-->
+            <!--<el-button v-for="item in tableBut" v-if="item.status" :key="item.name" :size="item.size" :type="item.type">{{ item.name }}</el-button>-->
+          <!--</template>-->
+        <!--</el-table-column> &ndash;&gt;-->
+      <!--</el-table>-->
+    <!--</div>-->
+    <!--表格树内容栏-->
+    <el-table :data="orglist"
+              stripe
+              size="mini"
+              style="width: 100%;">
+      <!--<el-table-column prop="encode"-->
+                       <!--header-align="center"-->
+                       <!--align="center"-->
+                       <!--width="80"-->
+                       <!--label="ID">-->
+      <!--</el-table-column>-->
+      <table-tree-column prop="fullname"
+                         header-align="center"
+                         treeKey="id"
+                         label="公司名称">
+      </table-tree-column>
+      <!--<el-table-column header-align="center"-->
+                       <!--align="center"-->
+                       <!--label="图标">-->
+        <!--<template slot-scope="scope">-->
+          <!--<i :class="scope.row.icon || ''"></i>-->
+        <!--</template>-->
+      <!--</el-table-column>-->
+      <el-table-column prop="encode"
+                       header-align="center"
+                       align="center"
+                       width="120"
+                       label="外文名称">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.ismenu === 0"
+                  size="small">目录</el-tag>
+          <el-tag v-else-if="scope.row.ismenu === 1"
+                  size="small"
+                  type="success">菜单</el-tag>
+          <el-tag v-else-if="scope.row.ismenu === 2"
+                  size="small"
+                  type="info">按钮</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="nature"
+                       header-align="center"
+                       align="center"
+                       width="120"
+                       label="公司性质">
+      </el-table-column>
+      <el-table-column prop="manager"
+                       header-align="center"
+                       align="center"
+                       width="150"
+                       :show-overflow-tooltip="true"
+                       label="负责人">
+      </el-table-column>
+      <el-table-column prop="outerphone"
+                       header-align="center"
+                       align="center"
+                       width="150"
+                       :show-overflow-tooltip="true"
+                       label="经营范围">
+      </el-table-column>
+      <el-table-column prop="description"
+                       header-align="center"
+                       align="center"
+                       label="备注">
+      </el-table-column>
+      <!--<el-table-column fixed="right"-->
+                       <!--header-align="center"-->
+                       <!--align="center"-->
+                       <!--width="150"-->
+                       <!--label="操作">-->
+        <!--<template slot-scope="scope">-->
+          <!--<kt-button label="修改"-->
+                     <!--perms="sys:menu:edit"-->
+                     <!--@click="handleEdit(scope.row)" />-->
+          <!--<kt-button label="删除"-->
+                     <!--perms="sys:menu:delete"-->
+                     <!--type="danger"-->
+                     <!--@click="handleDelete(scope.row)" />-->
+        <!--</template>-->
+      <!--</el-table-column>-->
+    </el-table>
+  </div>
+</template>
+
+<script>
+  import TableTreeColumn from "@/views/Core/TableTreeColumn";
+    export default {
+        name: "tablebody",
+      components:{TableTreeColumn},
+      data:function () {
+        return {
+          tablecols: [{
+            type:'',
+            width:'230px',
+            label:'公司名称',
+            value:'fullname'
+          },{
+            type:'',
+            width:'120px',
+            label:'外文名称',
+            value:'encode'
+          },{
+            type:'',
+            width:'100px',
+            label:'公司性质',
+            value:'nature'
+          },{
+            type:'',
+            width:'150px',
+            label:'成立时间',
+            value:'createdate'
+          },{
+            type:'',
+            width:'100px',
+            label:'负责人',
+            value:'manager'
+          },{
+            type:'',
+            width:'150px',
+            label:'经营范围',
+            value:'outerphone'
+          },{
+            type:'',
+            width:'',
+            label:'备注',
+            value:'description'
+          }],
+          tableBut: [{
+            type: 'primary',
+            size: 'mini',
+            status: true,
+            name: '编辑'
+          }, {
+            type: 'danger',
+            size: 'mini',
+            status: true,
+            name: '详细'
+          }, {
+            type: 'success',
+            size: 'mini',
+            status: true,
+            name: '删除'
+          }],
+        }
+      },
+      methods:{
+        handleCurrentChange:function (val) {
+          console.log(val)
+          this.$store.commit("setCurrent",val)
+        }
+      },
+      computed:{
+        // tabledel:function () {
+        //   // console.log(this.$store.getters.tabledel);
+        //   return this.$store.getters.tabledel
+        // },
+        // orgall:function () {
+        //   console.log(this.$store.getters.orgall);
+        //   return this.$store.getters.orgall
+        // },
+        orglist:function () {
+          console.log(this.$store.getters.orglist2);
+          return this.$store.getters.orglist2
+        }
+      }
+    }
+</script>
+
+<style scoped>
+
+</style>

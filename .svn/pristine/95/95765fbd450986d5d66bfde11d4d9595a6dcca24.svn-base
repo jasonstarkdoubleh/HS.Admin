@@ -1,0 +1,71 @@
+const dir = {
+  state: {
+    navigation: [],
+    itemcode: '',
+    tabledel: '',
+    currentRow: '',
+    navigation2: [],
+    orgForm: [],
+    orgall:[],
+    orglist:[],
+    current:'',
+    userInfo:[]
+  },
+  mutations: {
+    setNavigation(state, data) {
+      state.navigation = data
+    },
+    pushNavigation(state, data) {
+      state.navigation.push(data)
+    },
+    setTabledel(state, data) {
+      state.tabledel = data
+    },
+    setItemcode(state, data) {
+      state.itemcode = data
+    },
+    setCurrentRow(state, data) {
+      state.currentRow = data
+    },
+    setsetnavigation2(state, data) {
+      state.navigation2 = data
+    },
+    setOrgForm(state, data) {
+      state.orgForm = data
+    },
+    setorg(state,data){
+      state.orgall = data
+    },
+    setorgdate(state,data){
+      state.orgall[data[0]]["createdate"] = data[1]
+    },
+    addorglist(state,data){
+      state.orglist.push(data);
+    },
+    setCurrent(state,data){
+      state.current = data;
+    },
+    setUserInfo(state,data){
+      state.userInfo = data;
+    }
+  },
+  actions: {
+    pushNav({ commit }, data) {
+      commit('pushNavigation', data)
+    },
+    setTable({ commit }, data) {
+      commit('setTabledel', data)
+    },
+    setorgall({ commit },data){
+      commit('setorg',data)
+    },
+    pushorglist({ commit },data){
+      commit('addorglist',data)
+    },
+    setUser({commit},data){
+      commit("setUserInfo",data)
+    }
+  }
+};
+
+export default dir

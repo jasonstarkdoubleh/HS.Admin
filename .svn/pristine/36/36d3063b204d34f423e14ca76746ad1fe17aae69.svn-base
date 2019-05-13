@@ -1,0 +1,655 @@
+<template>
+  <el-container :style="{height:clientHeight}">
+
+    <!--头部-->
+    <el-header style="height: 60px">
+      <div id="tableheader">
+
+        <!--头部功能-->
+        <div id="headerAll">
+
+          <!--所在位置-->
+          <div class="position">
+            <span>{{position}}</span>
+          </div>
+
+          <div class="headerButton">
+
+            <!--搜索功能-->
+            <div class="search">
+              <el-select v-model="value" placeholder="请选择" size="small">
+                <el-option
+                  v-for="item in options1"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"/>
+              </el-select>
+            </div>
+
+            <div class="choinp">
+              <el-input v-model="inputdetails" placeholder="请输入内容" size="small"/>
+            </div>
+
+            <div class="choser">
+              <el-button type="primary" icon="el-icon-search" size="small" @click="searchContent">搜索</el-button>
+            </div>
+
+            <!--头部表单操作按钮-->
+            <div class="cho2">
+              <el-button type="success" plain size="small" icon="el-icon-plus" style="margin-left: 1px" @click="dialogFormVisible = true">新增</el-button>
+              <el-button type="warning" plain size="small" icon="el-icon-tickets" style="margin-left: 1px" @click="dictable">字典分类</el-button>
+            </div>
+          </div>
+        </div>
+
+        <!--表单弹窗-->
+        <el-dialog title="添加字典" :visible.sync="dialogFormVisible" width="40%">
+          <el-form ref="form" :model="form" label-width="80px">
+            <el-form-item label="项目名*">
+              <el-input v-model="form.itemname"></el-input>
+            </el-form-item>
+            <el-form-item label="项目值*">
+              <el-input v-model="form.itemvalue"></el-input>
+            </el-form-item>
+            <el-form-item label="排序">
+              <el-input v-model="form.sortcode"></el-input>
+            </el-form-item>
+            <el-form-item label="有效">
+              <el-switch v-model="valueTrue" style="margin-left: -500px"></el-switch>
+            </el-form-item>
+            <el-form-item label="备注">
+              <el-input type="textarea" v-model="form.description"></el-input>
+            </el-form-item>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogFormVisible = false">取 消</el-button>
+            <el-button type="primary" @click="addDirtails(form)">确 定</el-button>
+          </div>
+        </el-dialog>
+        <el-dialog title="字典分类" :visible.sync="dialogTableVisible" width="800px">
+          <el-container>
+            <el-header style="height: 20px">
+              <div class="choinp">
+                <el-input v-model="inputform" placeholder="请输入名称" size="small"/>
+              </div>
+              <div class="choser">
+                <el-button type="primary" icon="el-icon-search" size="small" @click="searchall">搜索</el-button>
+              </div>
+              <div class="cho2">
+                <el-button type="success" size="small" icon="el-icon-plus" style="margin-left: 1px" @click="addcontents">新增</el-button>
+                <el-button type="primary" size="small" icon="el-icon-edit" style="margin-left: 1px" @click="getDataTable">编辑</el-button>
+                <el-button type="danger" size="small" icon="el-icon-delete" style="margin-left: 1px" @click="delForm">删除</el-button>
+              </div>
+            </el-header>
+
+            <el-main>
+              <tree-table border/>
+            </el-main>
+
+          </el-container>
+        </el-dialog>
+        <el-dialog title="添加分类" :visible.sync="dialogContentsVisible">
+          <el-form ref="formcontents" :model="formcontents" label-width="80px">
+            <el-form-item label="上级*">
+              <treelist v-model="selected" :props="defaultProps" :options="options"></treelist>
+            </el-form-item>
+            <el-form-item label="名称*">
+              <el-input v-model="formcontents.itemname"></el-input>
+            </el-form-item>
+            <el-form-item label="编号*">
+              <el-input v-model="formcontents.itemcode"></el-input>
+            </el-form-item>
+            <el-form-item label="排序">
+              <el-input v-model="formcontents.sortcode"></el-input>
+            </el-form-item>
+            <el-form-item label="备注">
+              <el-input type="textarea" v-model="formcontents.description"></el-input>
+            </el-form-item>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogContentsVisible = false">取 消</el-button>
+            <el-button type="primary" @click="addtable(formcontents)">确 定</el-button>
+          </div>
+        </el-dialog>
+        <el-dialog title="编辑分类" :visible.sync="dialogEditVisible">
+          <el-form ref="formEdit" :model="formEdit" label-width="80px">
+            <el-form-item label="上级*">
+              <treelist v-model="selected2" :props="defaultProps" :options="options"></treelist>
+            </el-form-item>
+            <el-form-item label="名称*">
+              <el-input v-model="formEdit.item"></el-input>
+            </el-form-item>
+            <el-form-item label="编号*">
+              <el-input v-model="formEdit.itemcode"></el-input>
+            </el-form-item>
+            <el-form-item label="排序">
+              <el-input v-model="formEdit.sortcode"></el-input>
+            </el-form-item>
+            <el-form-item label="备注">
+              <el-input type="textarea" v-model="formEdit.description"></el-input>
+            </el-form-item>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogEditVisible = false">取 消</el-button>
+            <el-button type="primary" @click="updateEdit(formEdit)">确 定</el-button>
+          </div>
+        </el-dialog>
+      </div>
+    </el-header>
+
+    <!--主体部分-->
+    <el-main>
+      <div id="tablemain">
+
+       <!--内容展示-->
+        <div id="dirtable">
+
+          <!--表格设置-->
+          <el-table
+            :data="tabledetails"
+            border
+            highlight-current-row
+            @current-change="handleCurrentChange"
+            style="width: 100%">
+
+            <!--排序-->
+            <el-table-column
+              type="index"
+              width="50">
+            </el-table-column>
+
+            <el-table-column
+              v-for="item in tablecols"
+              :key="item.label"
+              :type="item.type"
+              :width="item.width"
+              :prop="item.value"
+              :label="item.label">
+            </el-table-column>
+
+            <!--有效-->
+            <el-table-column label="有效" align="center" :width="youxiao">
+              <template slot-scope="scope">
+                <el-switch active-color="#13ce66" inactive-color="#ff4949" v-model="scope.row.enabledmark==1?true:false"></el-switch>
+              </template>
+            </el-table-column>
+
+            <!--表单操作按钮-->
+            <el-table-column label="操作" align="center">
+              <template slot-scope="scope">
+                <el-button type="primary" size="mini" @click="editDirtails">编辑</el-button>
+                <el-button type="success" size="mini" @click="dialogFormDetails = true">详细</el-button>
+                <el-button type="danger" size="mini" @click="delTable">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+
+        </div>
+
+        <!--表单弹窗-->
+        <el-dialog title="字典编辑" :visible.sync="dialogDetailsVisible">
+          <el-form ref="EditTable" :model="EditTable" label-width="80px">
+            <el-form-item label="项目名*">
+              <el-input v-model="EditTable.itemname" ></el-input>
+            </el-form-item>
+            <el-form-item label="项目值*">
+              <el-input v-model="EditTable.itemvalue"></el-input>
+            </el-form-item>
+            <el-form-item label="排序">
+              <el-input v-model="EditTable.sortcode"></el-input>
+            </el-form-item>
+            <el-form-item label="有效">
+              <el-switch v-model="EditTable.enabledmark" style="margin-left: -500px"></el-switch>
+            </el-form-item>
+            <el-form-item label="备注">
+              <el-input type="textarea" v-model="EditTable.description"></el-input>
+            </el-form-item>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogDetailsVisible = false">取 消</el-button>
+            <el-button type="primary" @click="editTrue(EditTable)">确 定</el-button>
+          </div>
+        </el-dialog>
+        <el-dialog title="字典详情" :visible.sync="dialogFormDetails">
+          <el-form ref="EditTable" :model="EditTable" label-width="80px">
+            <el-form-item label="项目名">
+              <el-input v-model="EditTable.itemname" readonly></el-input>
+            </el-form-item>
+            <el-form-item label="项目值">
+              <el-input v-model="EditTable.itemvalue" readonly></el-input>
+            </el-form-item>
+            <el-form-item label="排序">
+              <el-input v-model="EditTable.sortcode" readonly></el-input>
+            </el-form-item>
+            <el-form-item label="有效">
+              <el-switch v-model="EditTable.enabledmark" style="margin-left: -500px" disabled></el-switch>
+            </el-form-item>
+            <el-form-item label="备注">
+              <el-input type="textarea" v-model="EditTable.description" readonly></el-input>
+            </el-form-item>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogFormDetails = false">取 消</el-button>
+            <el-button type="primary" @click="dialogFormDetails = false">确 定</el-button>
+          </div>
+        </el-dialog>
+      </div>
+    </el-main>
+  </el-container>
+</template>
+
+<script>
+  import treelist from '@/views/Core/treelist'
+  import treeTable from "@/views/Core/table/treeTable/treeTable"
+  import TableTreeColumn from "@/views/Core/TableTreeColumn";
+    export default {
+        name: "dictionaryMain",
+      components:{ treelist ,treeTable,TableTreeColumn},
+      data:function () {
+        return {
+          valueTrue:true,
+          initialPosition:'字典详情',
+          tableSelect:[],
+          handleAllRow:'',
+          options: [],
+          defaultProps: {
+            parent: 'itemcode',   // 父级唯一标识
+            value: 'id',          // 唯一标识
+            label: 'item',       // 标签显示
+            children: 'children', // 子级
+          },
+          selected:'',
+          selected2:'',
+          options1: [{
+            value: '1',
+            label: '项目名'
+          }, {
+            value: '2',
+            label: '项目值'
+          }],
+          value:'',
+          inputdetails: '',
+          inputform:'',
+          navigation3:[{
+            item:'',
+            itemcode:'',
+            sortcode:'',
+            description:''
+          }],
+          form: {
+            itemname: '',
+            itemvalue: '',
+            sortcode: 0,
+            description: '',
+            itemid:''
+          },
+          formcontents:{
+            parentid: '',
+            itemname: '',
+            itemcode: '',
+            sortcode:'',
+            description: '',
+          },
+          formEdit:{
+            parentid: '',
+            item: '',
+            itemcode: '',
+            sortcode:'',
+            description: '',
+            itemid:''
+          },
+          dialogFormVisible: false,
+          dialogTableVisible: false,
+          dialogContentsVisible:false,
+          dialogEditVisible:false,
+          formLabelWidth: '120px',
+          tableDatas:[],
+          youxiao:'100px',
+          delData:'',
+          readonly:true,
+          dialogDetailsVisible:false,
+          dialogFormDetails:false,
+          EditTable: {
+            itemname: '',
+            itemvalue: '',
+            sortcode: '',
+            description: '',
+            parentid:'',
+            itemid:'',
+            enabledmark:''
+          },
+          tablecols: [{
+            type:'',
+            width:'100px',
+            label:'项目名',
+            value:'itemname'
+          },{
+            type:'',
+            width:'100px',
+            label:'项目值',
+            value:'itemvalue'
+          },{
+            type:'',
+            width:'100px',
+            label:'排序',
+            value:'sortcode'
+          },{
+            type:'',
+            width:'150px',
+            label:'备注',
+            value:'description'
+          }],
+          tableBut: [{
+            type: 'primary',
+            size: 'mini',
+            status: true,
+            name: '编辑'
+          }, {
+            type: 'danger',
+            size: 'mini',
+            status: true,
+            name: '详细'
+          }, {
+            type: 'success',
+            size: 'mini',
+            status: true,
+            name: '删除'
+          }],
+        }
+      },
+      methods:{
+        searchContent:function(){
+          this.tableSelect = [];
+          if(this.inputdetails == ''){
+            this.$api.dic.showform(this.itemparent2).then(response => {
+              this.$store.dispatch("setTable",response.data.data) ;
+            })
+          }else{
+            if(this.value == 1){
+              for(let i in this.tabledetails){
+                if(this.tabledetails[i].itemname){
+                  if(this.tabledetails[i].itemname.indexOf(this.inputdetails) != -1){
+                    this.tableSelect.push(this.tabledetails[i]);
+                  }
+                }
+              }
+              this.$store.commit("setTabledel",this.tableSelect);
+            }
+            if(this.value == 2){
+              for(let i in this.tabledetails){
+                if(this.tabledetails[i].itemvalue){
+                  if(this.tabledetails[i].itemvalue.indexOf(this.inputdetails) != -1){
+                    this.tableSelect.push(this.tabledetails[i]);
+                  }
+                }
+              }
+              this.$store.commit("setTabledel",this.tableSelect);
+            }
+          }
+        },
+        addDirtails(data){
+          if(this.form.itemname == ''){
+            this.$message.error('项目名不能为空');
+          }else if(this.form.itemvalue == ''){
+            this.$message.error('项目值不能为空');
+          }else {
+            this.dialogFormVisible = false;
+            if(this.valueTrue){
+              this.form.enabledmark = 1;
+            }else {
+              this.form.enabledmark = 0;
+            }
+            this.tabledetails.push(this.form);
+            this.form.itemid = this.itemparent;
+            this.$api.dic.saveItemDetial(data);
+          }
+        },
+        delForm:function(){
+          if(!this.handleChangeValue){
+            this.$message.error("请先选中数据在进行删除操作")
+          }else {
+            this.$confirm('此操作将删除该数据, 是否继续?', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => {
+              // for(let i in this.navigation){
+              //   for(let j in this.navigation[i]){
+              //     if(this.navigation[i].children[j].id == this.handleChangeValue.id){
+              //       console.log(his.navigation[i].children[j].id);
+              //       break;
+              //     }
+              //   }
+              // }
+              console.log(this.navigation);
+              this.$api.dic.deleteform(this.handleChangeValue.id);
+            }).then(() => {
+              this.$message({
+                type: 'success',
+                message: '删除成功!'
+              });
+            }).catch(() => {
+              this.$message({
+                type: 'info',
+                message: '已取消删除'
+              });
+            });
+          }
+        },
+        getDataTable:function(){
+          if(!this.handleChangeValue){
+            this.$message.error("请先选中数据后再进行编辑")
+          }else {
+            this.dialogEditVisible=true;
+            this.formEdit=this.handleChangeValue;
+            console.log(this.handleChangeValue);
+            if(this.formEdit.hasOwnProperty('parent')){
+              this.selected2=this.formEdit.parent.id;
+            }else {
+              this.selected2= ''
+            }
+          }
+        },
+        dictable:function(){
+          this.dialogTableVisible = true;
+          this.options=[];
+          this.dataOptions()
+        },
+        dataOptions:function(){
+          for(let i in this.navigation){
+            const node= {
+              id : this.navigation[i].id,
+              itemcode:this.navigation[i].itemcode,
+              item:this.navigation[i].item,
+              children:[]
+            };
+            for(let j in this.navigation[i].children) {
+              const node1 = {
+                id: this.navigation[i].children[j].id,
+                itemcode: this.navigation[i].children[j].itemcode,
+                item: this.navigation[i].children[j].item,
+                children:[]
+              };
+              node.children.push(node1);
+              if(node1.children.length > 0){
+                for (let k in this.navigation[i].children[j].children[k]){
+                  const node2 = {
+                    id: this.navigation[i].children[j].children[k].id,
+                    itemcode: this.navigation[i].children[j].children[k].itemcode,
+                    item: this.navigation[i].children[j].children[k].item,
+                    children:[]
+                  };
+                  node1.children.push(node2);
+                }
+              }
+            }
+            this.options.push(node);
+          }
+          console.log(this.options.length)
+        },
+        addcontents:function (){
+          this.dialogContentsVisible = true
+        },
+        addtable:function (data) {
+          if(this.formcontents.itemcode == ''){
+            this.$message.error('项目值不能为空')
+          }else{
+            this.dialogContentsVisible=false;
+            this.formcontents.parentid=this.selected;
+            console.log(this.formcontents);
+            // if()
+            this.$api.dic.addform(data).then(response => {
+              console.log(response.data.data);
+            })
+          }
+        },
+        updateEdit:function(data){
+          if(this.formEdit.itemid == ''){
+            this.$message.error('项目值不能为空')
+          }else{
+            this.dialogEditVisible=false;
+            this.formEdit.itemid = this.formEdit.id;
+            this.formEdit.itemname = this.formEdit.item;
+            if(this.selected2){
+              this.formEdit.parentid = this.selected2;
+            }else {
+              this.formEdit.parentid = 0;
+            }
+            delete this.formEdit.parent;
+            delete this.formEdit.id;
+            delete this.formEdit.item;
+            delete this.formEdit.children;
+            console.log(this.formEdit);
+            this.$api.dic.updateform(data).then(res =>{
+              console.log(res)
+            });
+          }
+        },
+        searchall:function(){
+          console.log(this.inputform);
+          this.$api.dic.searchform(this.inputform)
+        },
+        delTable:function(){
+          this.$confirm('此操作将删除该数据, 是否继续?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            for(let i in this.tabledetails){
+              if(this.tabledetails[i].itemdetailid == this.delData){
+                this.tabledetails.splice(i,1);
+                break
+              }
+            }
+            this.$api.dic.deleteItemDetial(this.delData);
+          }).then(() => {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            });
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消删除'
+            });
+          });
+        },
+        editDirtails:function(){
+          this.dialogDetailsVisible = true;
+        },
+        handleCurrentChange:function (val) {
+          console.log(val);
+          // this.EditTable.itemname = val.itemname;
+          // this.EditTable.itemvalue = val.itemvalue;
+          // this.EditTable.sortcode = val.sortcode;
+          // this.EditTable.description = val.description;
+          // this.EditTable.parentid = val.parentid;
+          // this.EditTable.itemid = val.itemid;
+          // this.EditTable.itemdetailid = val.itemdetailid;
+          this.EditTable = val;
+          this.delData = val.itemdetailid;
+          this.EditTable.enabledmark = this.EditTable.enabledmark == 1?true:false;
+        },
+        editTrue:function (data) {
+          this.dialogDetailsVisible = false;
+          if(this.EditTable.enabledmark){
+            this.EditTable.enabledmark = 1;
+          }else {
+            this.EditTable.enabledmark = 0;
+          }
+          console.log(data);
+          this.$api.dic.updateItemDetial(data).then(res => console.log(res));
+        }
+      },
+      computed:{
+        clientHeight:function(){
+          return this.$store.getters.clientHeight+'px'
+        },
+        navigation:function () {
+          return this.$store.getters.navigation;
+        },
+        itemcode:function () {
+          return this.$store.getters.itemcode;
+        },
+        handleChangeValue:function () {
+          return this.$store.getters.currentRow;
+        },
+        itemparent:function () {
+          return this.$store.getters.itemparent2;
+        },
+        tabledetails(){
+          console.log(this.$store.getters.tabledel);
+          return this.$store.getters.tabledel;
+        },
+        itemparent2:function () {
+          return this.$store.getters.itemparent;
+        },
+        position(){
+          if(this.$store.getters.itemparent3){
+            this.initialPosition = this.$store.getters.itemparent3;
+          }
+          return this.initialPosition;
+        }
+      },
+    }
+</script>
+
+<style scoped>
+  #headerAll{
+    height: 80px;
+  }
+  .position{
+    height: 30px;
+    line-height: 30px;
+    border-bottom: 1px solid #c5c9cf;
+    font-size: 12px;
+  }
+  .position span{
+    float: left;
+  }
+  .headerButton{
+    height: 50px;
+  }
+  .headerButton>*{
+    margin-top: 8px;
+  }
+  .choinp,.search,.choser{
+    display: inline-block;
+    float: left;
+  }
+  .search{
+    width: 100px;
+  }
+  .choinp{
+    width: 200px;
+    margin-left: 2px;
+    margin-right: 2px;
+  }
+  .cho2{
+    float: right;
+    margin-right: 10px;
+  }
+  .cho2 div{
+    float: right;
+  }
+</style>

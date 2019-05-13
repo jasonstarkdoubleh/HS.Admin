@@ -1,0 +1,118 @@
+<template>
+  <div id="tablemain">
+    <div id="dirtable">
+      <el-table
+        :data="userInfos"
+        border
+        highlight-current-row
+        @current-change="handleCurrentChange"
+        style="width: 100%">
+        <el-table-column
+          v-for="item in tablecols"
+          :key="item.label"
+          :type="item.type"
+          :width="item.width"
+          :prop="item.value"
+          :label="item.label">
+        </el-table-column>
+        <!-- <el-table-column label="actions" align="center">
+          <template slot-scope="scope">
+            <el-button v-for="item in tableBut" v-if="item.status" :key="item.name" :size="item.size" :type="item.type">{{ item.name }}</el-button>
+          </template>
+        </el-table-column> -->
+      </el-table>
+    </div>
+  </div>
+</template>
+
+<script>
+    export default {
+        name: "tablebody",
+      data:function () {
+        return {
+          tablecols: [{
+            type:'',
+            width:'100px',
+            label:'账户',
+            value:'username'
+          },{
+            type:'',
+            width:'100px',
+            label:'姓名',
+            value:'realname'
+          },{
+            type:'',
+            width:'100px',
+            label:'性别',
+            value:'gender'
+          },{
+            type:'',
+            width:'120px',
+            label:'手机',
+            value:'mobile'
+          },{
+            type:'',
+            width:'100px',
+            label:'部门',
+            value:''
+          },{
+              type:'',
+              width:'100px',
+              label:'岗位',
+              value:'dutyname'
+            },{
+              type:'',
+              width:'180px',
+              label:'职位',
+              value:'postname'
+            },{
+              type:'',
+              width:'100px',
+              label:'主管',
+              value:'manager'
+            },{
+              type:'',
+              width:'',
+              label:'备注',
+              value:'description'
+            }],
+          tableBut: [{
+            type: 'primary',
+            size: 'mini',
+            status: true,
+            name: '编辑'
+          }, {
+            type: 'danger',
+            size: 'mini',
+            status: true,
+            name: '详细'
+          }, {
+            type: 'success',
+            size: 'mini',
+            status: true,
+            name: '删除'
+          },{
+            type:'',
+            width:'',
+            label:'备注',
+            value:'description'
+          }],
+        }
+      },
+      methods:{
+        handleCurrentChange:function (val) {
+          console.log(val);
+          this.$store.commit("setCurrent",val)
+        }
+      },
+      computed:{
+        userInfos:function () {
+          return this.$store.getters.userInfo
+        }
+      }
+    }
+</script>
+
+<style scoped>
+
+</style>

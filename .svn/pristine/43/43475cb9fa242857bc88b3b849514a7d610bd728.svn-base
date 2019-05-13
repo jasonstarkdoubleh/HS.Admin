@@ -1,0 +1,78 @@
+<template>
+    <div id="tableaside" :style="{height: clientHeight}">
+      <div class="dirname">
+        <span>字典分类</span>
+      </div>
+       <el-scrollbar style="height: 100%;overflow-x: hidden;">
+        <el-menu :default-openeds="openlist"  @open="handleOpen" style="text-align: left;width: 100%">
+            <el-submenu v-for="nav in navigation" :key="nav.item" :index="nav.item" @click="addOpendir()">
+              <template slot="title"><i class="el-icon-message"/>{{ nav.item }}</template>
+              <el-menu-item v-for="child in nav.children" :key="child.id" :index="child.id" @click="getcode(child.itemcode,child.id,child.item)">{{ child.item }}</el-menu-item>
+            </el-submenu> 
+        </el-menu>
+        </el-scrollbar>
+    </div>
+</template>
+
+<script>
+  // import { showform } from '@/api/dic'
+    export default {
+        name: "dictionaryAside",
+      data(){
+          return {
+            openlist : [],
+          }
+      },
+      methods:{
+        getcode(data,data2,data3){
+          this.$store.commit("setitemparent",data);
+          this.$store.commit("setitemparent2",data2);
+          this.$store.commit("setitemparent3",data3);
+          this.$api.dic.showform(data).then(response => {
+            this.$store.dispatch("setTable",response.data.data) ;
+          })
+        },
+        handleOpen(key) {
+          this.openlist = [];
+          this.openlist.push(key);
+        },
+      },
+      computed: {
+        navigation:function(){
+          return this.$store.getters.navigation;
+        },
+        opendir: function() {
+          this.openlist = [];
+          for (let i = 0; i < this.navigation.length; i++) {
+            this.openlist.push(this.navigation[i].item)
+          }
+          return this.openlist
+        },
+        clientHeight:function(){
+          return this.$store.getters.clientHeight+'px'
+        }
+      },
+    }
+</script>
+
+<style scoped>
+  .dirname{
+    height: 30px;
+    line-height: 30px;
+    border-bottom: 1px solid #c5c9cf;
+    font-size: 12px;
+    background: #ffffff;
+  }
+  .dirname span{
+    float: left;
+    margin-left: 5px;
+  }
+  .el-scrollbar__wrap {
+    overflow-x: hidden;
+  }
+  #tableaside{
+    background: #ffffff;
+    width: 200px;
+    overflow:hidden
+  }
+</style>

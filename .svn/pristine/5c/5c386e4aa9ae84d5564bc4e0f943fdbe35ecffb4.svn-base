@@ -1,0 +1,67 @@
+<template>
+  <div id="dirhigh" style="margin-top: 20px">
+      <tablemain></tablemain>
+  </div>
+</template>
+
+<script>
+  import tablemain from './tablemain'
+export default {
+    name:"Organiaze",
+    data:function(){
+      return {
+        navdata:'',
+      }
+    },
+  components: { tablemain },
+  methods:{
+    getTree( a,b,c ) {
+      for (let i in b) {
+        if (a.organizeid === b[i].parentid) {
+          const  d={};
+          d.item=b[i].fullname;
+          d.id=b[i].organizeid;
+          d.itemcode=b[i].parentid;
+          d.children=[];
+          this.getTree(b[i], b, d);
+          c.children.push(d);
+        }
+      }
+    },
+    getall:function(){
+      this.$api.dic.getOrgAll().then(res => {
+        this.navdata = res.data.data;
+        for (let i in this.navdata) {
+          if (this.navdata[i].parentid == "0") {
+            const treenodes={item:"",id:"",itemcode:"",children:[]};
+            treenodes.item=this.navdata[i].fullname;
+            treenodes.id=this.navdata[i].organizeid;
+            treenodes.itemcode=this.navdata[i].parentid;
+            this.getTree(this.navdata[i], this.navdata, treenodes);
+            // console.log(treenodes);
+            this.$store.dispatch("pushorglist",treenodes)
+          }
+        }
+        this.$store.dispatch("setorgall",res.data.data);
+      }).then(()=>{
+        console.log(this.$store.getters.orglist);
+        for(var i in this.orgall){
+          this.$store.commit("setorgdate",[i,this.orgall[i].createdate.substring(0,10)])
+        }
+        });
+    }
+  },
+  computed:{
+    orgall:function () {
+      return this.$store.getters.orgall
+    }
+  },
+  created:function () {
+    this.getall();
+  }
+}
+</script>
+
+<style scoped>
+
+</style>

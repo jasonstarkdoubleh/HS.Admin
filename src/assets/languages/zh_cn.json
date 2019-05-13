@@ -1,0 +1,23 @@
+{
+    "common": {
+        "home": "首页",
+        "login": "登录",
+        "logout": "退出",
+        "doc": "文档",
+        "blog": "博客",
+        "projectRepo": "项目",
+        "myMsg": "我的消息",
+        "config": "系统配置",           
+        "backup": "备份还原",           
+        "exit": "退出"
+    },
+    "sys": {
+        "sysMng": "系统管理",
+        "userMng": "用户管理",
+        "deptMng": "机构管理",
+        "roleMng": "角色管理",
+        "menuMng": "菜单管理",
+        "logMng": "日志管理",
+        "sysMonitor": "系统监控"
+    }
+}

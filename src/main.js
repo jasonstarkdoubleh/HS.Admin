@@ -1,0 +1,33 @@
+import Vue from 'vue'
+import App from './App'
+import router from './router'
+import api from './api'
+import i18n from './i18n'
+import store from './store'
+import global from '@/utils/global'
+import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
+import 'font-awesome/css/font-awesome.min.css'
+import '@/assets/iconfont/iconfont.css'
+import '../static/public.css'
+
+Vue.use(ElementUI)
+Vue.use(api)
+
+Vue.prototype.global = global
+
+new Vue({
+  el: '#app',
+  methods:{
+    getall:function () {
+      console.log(this);
+    }
+  },
+  created(){
+    this.getall()
+  },
+  i18n,
+  router,
+  store,
+  render: h => h(App)
+});

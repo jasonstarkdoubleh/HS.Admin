@@ -1,0 +1,58 @@
+body{
+  overflow: hidden;
+}
+.el-aside>#tableaside{
+  overflow: hidden;
+}
+#colorRemark .el-scrollbar__wrap{
+  overflow-x: hidden;
+}
+#colorRemark .app-container .el-scrollbar__wrap{
+  overflow-x: hidden;
+}
+#colorRemark .menu-bar-container .el-menu[data-v-2aa9a7c5]{
+  background: #212862;
+}
+#colorRemark .el-submenu__title{
+  color: #b8c7ce;
+}
+#colorRemark .el-submenu__title:hover{
+  color: #ffffff;
+  background: none;
+  font-size: 16px;
+}
+#colorRemark .el-menu-item{
+  color: #b8c7ce;
+  background: #212862;
+}
+#colorRemark .el-submenu__title[data-v-9c434fe0]{
+  background: #212862;
+}
+#colorRemark li.el-menu-item:focus, li.el-menu-item{
+  color: #b8c7ce;
+}
+#colorRemark li.el-menu-item:focus, li.el-menu-item:hover{
+  background: #212862;
+  font-size: 16px;
+  color: #ffffff;
+}
+#colorRemark div.el-submenu__title{
+  background: #212862;
+}
+#colorRemark div.el-submenu__title:hover{
+  font-size: 16px;
+  background: #212862;
+}
+/*.el-table--enable-row-hover .el-table__body tr:hover>td{*/
+  /*background-color: #212e3e !important;*/
+/*}*/
+.el-table__body tr:focus>td{
+  background-color: #212e3e !important;
+}
+#tablemain .el-scrollbar__wrap {
+  overflow-x: hidden;
+  height: 100%;
+}
+#menuFirst .el-scrollbar__wrap{
+  overflow-x: hidden;
+}

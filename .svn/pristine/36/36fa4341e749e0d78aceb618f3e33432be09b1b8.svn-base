@@ -1,0 +1,63 @@
+<template>
+  <div id="dirhigh" style="margin-top: 20px">
+      <tablemain></tablemain>
+  </div>
+</template>
+
+<script>
+  import tablemain from './tablemain'
+export default {
+    name:"Organiaze",
+    data:function(){
+      return {
+        navdata:'',
+      }
+    },
+  components: { tablemain },
+  methods:{
+    getTree( a,b,c ) {
+      for (let i in b) {
+        if (a.organizeid === b[i].parentid) {
+          const  d={};
+          d.item=b[i].fullname;
+          d.id=b[i].organizeid;
+          d.itemcode=b[i].parentid;
+          d.children=[];
+          this.getTree(b[i], b, d);
+          c.children.push(d);
+        }
+      }
+    },
+    getall:function(){
+      this.$store.commit('setorglist',[]);
+      this.$api.dic.getOrgAll().then(res => {
+        this.navdata = res.data.data;
+        for (let i in this.navdata) {
+          if (this.navdata[i].parentid == "0") {
+            const treenodes={item:"",id:"",itemcode:"",children:[]};
+            treenodes.item=this.navdata[i].fullname;
+            treenodes.id=this.navdata[i].organizeid;
+            treenodes.itemcode=this.navdata[i].parentid;
+            this.getTree(this.navdata[i], this.navdata, treenodes);
+            this.$store.dispatch("pushorglist",treenodes)
+          }
+        }
+      })
+    },
+    getUser:function () {
+      this.$api.dic.getUserInfos().then(res => {
+        console.log(res.data.data);
+        this.$store.dispatch("setUser",res.data.data)
+      });
+    },
+  },
+  created:function () {
+    this.getall();
+    this.getUser();
+  }
+}
+</script>
+
+<style scoped>
+
+</style>
